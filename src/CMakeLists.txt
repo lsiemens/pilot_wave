@@ -1,3 +1,3 @@
 add_subdirectory(core)
-add_subdirectory(__PROJECT__)
+add_subdirectory(pilot_wave)
 

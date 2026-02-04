@@ -199,7 +199,7 @@ int main() {
 
     GLFWwindow* window;
     int width=1024, height=768;
-    window = glfwCreateWindow( width, height, "GLTest", NULL, NULL);
+    window = glfwCreateWindow( width, height, "Pilot Wave", NULL, NULL);
     if (window == NULL) {
         std::cerr << "Failed to create GLFW window.\n";
         glfwTerminate();

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.19)
-project(__PROJECT__
+project(pilot_wave
     VERSION 1.0
     LANGUAGES CXX)
 
@@ -18,9 +18,9 @@ option(STRICT_WARNINGS "Enable strict compiler warnings" ON)
 option(ERROR_ON_WARNING "Treat warnings to errors" OFF)
 option(BUILD_DOCS "Build documentation" ON)
 
-add_library(__PROJECT___warnings INTERFACE)
+add_library(pilot_wave_warnings INTERFACE)
 if(ENABLE_WARNINGS)
-    target_compile_options(__PROJECT___warnings INTERFACE
+    target_compile_options(pilot_wave_warnings INTERFACE
         $<$<CXX_COMPILER_ID:GNU,Clang>: -Wall -Wextra -Wpedantic -Wshadow -Wformat=2 -Wundef>
         $<$<AND:$<BOOL:${STRICT_WARNINGS}>,$<CXX_COMPILER_ID:GNU,Clang>>: -Wconversion>
         $<$<CXX_COMPILER_ID:Clang>: -Wdocumentation>
@@ -39,7 +39,7 @@ if(BUILD_DOCS)
 
         set(DOXYGEN_PROJECT_GENERATE_HTML YES)
         set(DOXYGEN_RECURSIVE YES)
-        doxygen_add_docs(__PROJECT___docs ALL
+        doxygen_add_docs(pilot_wave_docs ALL
             "${PROJECT_SOURCE_DIR}/README.md"
             "${PROJECT_SOURCE_DIR}/src"
             COMMENT "Generating Doxygen documentation")
