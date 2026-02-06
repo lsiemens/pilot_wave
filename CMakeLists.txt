@@ -16,7 +16,7 @@ find_package(glfw3 CONFIG)
 option(ENABLE_WARNINGS "Enable compiler warnings" ON)
 option(STRICT_WARNINGS "Enable strict compiler warnings" ON)
 option(ERROR_ON_WARNING "Treat warnings to errors" OFF)
-option(BUILD_DOCS "Build documentation" ON)
+option(BUILD_DOC "Build documentation" ON)
 
 add_library(pilot_wave_warnings INTERFACE)
 if(ENABLE_WARNINGS)
@@ -28,24 +28,8 @@ if(ENABLE_WARNINGS)
         $<$<AND:$<BOOL:${ERROR_ON_WARNING}>,$<CXX_COMPILER_ID:GNU,Clang>>: -Werror>)
 endif()
 
-if(BUILD_DOCS)
-    find_package(Doxygen)
-
-    if(DOXYGEN_FOUND)
-        set(DOXYGEN_PROJECT_NAME "${PROJECT_NAME}")
-        set(DOXYGEN_PROJECT_NUMBER "${PROJECT_VERSION}")
-        set(DOXYGEN_PROJECT_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINDARY_DIR}/doxygen")
-        set(DOXYGEN_USE_MDFILE_AS_MAINPAGE "${PROJECT_SOURCE_DIR}/README.md")
-
-        set(DOXYGEN_PROJECT_GENERATE_HTML YES)
-        set(DOXYGEN_RECURSIVE YES)
-        doxygen_add_docs(pilot_wave_docs ALL
-            "${PROJECT_SOURCE_DIR}/README.md"
-            "${PROJECT_SOURCE_DIR}/src"
-            COMMENT "Generating Doxygen documentation")
-    else()
-        message(WARNING "Doxygen not found")
-    endif()
+if(BUILD_DOC)
+    add_subdirectory(doc)
 endif()
 
 add_subdirectory(src)
