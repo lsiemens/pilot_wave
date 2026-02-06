@@ -11,6 +11,7 @@
 #include "core/frame_timer.h"
 #include "core/model.h"
 #include "core/object.h"
+#include "core/particles.h"
 #include "core/camera.h"
 #include "core/shaders.h"
 #include "core/path_util.h"
@@ -239,8 +240,13 @@ int main() {
 
     Object torus = initalizeTorus(shaderID);
     torus.m_position = glm::vec3(-3.0f, 0.0f, -3.0f);
+
+    Particles test_particles(torus.m_model, 2000);
+
     float dt;
     do {
+        test_particles.spawn_particle(1.0f, glm::vec3(0.0f, 0.0f, 0.0f));
+
         // Timing
         dt = static_cast<float>(timer.timer());
         loopLog->flush();
@@ -256,10 +262,12 @@ int main() {
         surface.update(dt);
         sphere.update(dt);
         torus.update(dt);
+        test_particles.update(dt);
 
         surface.drawObject();
         sphere.drawObject();
         torus.drawObject();
+        test_particles.drawParticles();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
