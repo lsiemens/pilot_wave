@@ -77,14 +77,32 @@
 /// sampling space weighted by the target probability density, replacing
 /// particles as the die from the same distribution.
 ///
-/// Alternatifly given uniform spatial sampling a variable decay rate can also
-/// be used to approch a given target distributon. Start with the following
+/// Alternatifly given uniform spatial sampling, a variable decay rate can also
+/// be used to approach a given target distribution. Start with the following
 /// parameters, the maximum mean lifetime \f$\bar{t}_\max\f$, the target total
 /// number of particles \f$N\f$ and a normalized probability density \f$\rho(x)\f$.
 /// From these parametes we can calculate a uniform and constant particle
 /// creation rate \f$\lambda\f$ and a local decay rate \f$\Gamma(x)\f$ such that
 /// the asymptotic particle density is proportional to the probability density
 /// \f$\rho(x)\f$.
+///
+/// Define the maximum of the probability density as \f$\rho_\max\f$ and note
+/// that the target particle density is \f$n(x) = N\rho(x)\f$. Since the
+/// particle density generation rate is constant we can directly calculate it at
+/// the point where the desisty is maximized using parameters on hand. Combining
+/// the equations for the expected mean lifetime and asymptotic particle density
+/// the particle creation rate can be found. Solving the equation gives
+/// \f$\lambda = \frac{N\rho_\max}{\bar{t}_\max}\f$, note as expected this is a particle
+/// density rate. Now we can use the particle generation rate in the equation
+/// for the particle decay rate to find the decay rate as a function of
+/// position. After some cansellation
+/// \f$\Gamma(x) = \frac{\rho_\max}{\rho \bar{t}_\max}\f$. This decay rate and
+/// particle creation rate combine to reproduce the desired target asyptotic
+/// distribution. Starting from some arbitrary initial particle density
+/// distribution (often it will be n_0(x) = 0) the distribution will approch
+/// \f$n(x) = N\rho(x)\f$ at an exponential rate with a maximum half-life of
+/// \f$\bar{t}_\max \ln(2)\f$.
+///
 
 
 #ifndef PARTICLES_H
@@ -125,18 +143,24 @@ public:
 
     /// A pool of preallocated particles.
     std::vector<Particle> m_particle_set;
+
     /// The indices of live particles in the pool.
     std::vector<std::size_t> m_live_IDs;
+
     /// The indices of dead particles in the pool.
     std::vector<std::size_t> m_dead_IDs;
 
+
     Particles(Model model, std::size_t pool_size);
+
 
     /// Draw all live particles in the pool.
     void drawParticles();
+
     /// Run an update for all live particles in the pool.
     /// @param dt size of the current time step.
     void update(float dt);
+
     /// Create a new live particle.
     /// If there are available dead particles in the pool, one will be revived.
     /// If there are no available dead particles in the pool, a new live
@@ -144,10 +168,37 @@ public:
     /// @param decay_rate The particles decay rate.
     /// @param position The position of the new particle.
     void spawn_particle(double decay_rate, glm::vec3 position);
+
     /// Kill a live particle in the pool.
     /// @param index_in_live The index of the particle in the list of indices of
     /// live particles m_live_IDs.
     void kill_particle(std::size_t index_in_live);
+    
+    /// calculate the particle generation rate.
+    /// Find the right particle generation rate so the longest lived particles
+    /// match the target mean lifetime.
+    /// @param t_max The mean lifetime of the longest lived particles in seconds.
+    /// @param rho_max The maximum probability density of the distribution in
+    /// particles per unit volume.
+    /// @param N The target total number of particles when converged.
+    /// @returns The generation rate \f$\lambda\f$ in particles per second per
+    /// unit volume.
+    double generation_rate(double t_max, double rho_max, int N) {
+        return static_cast<double>(N)*rho_max/t_max;
+    }
+
+    /// Calculate the particle decay rate.
+    /// Find the particle decay rate at a point that will produce the target
+    /// asymptotic particle density.
+    /// @param t_max The mean lifetime of the longest lived particles in seconds.
+    /// @param rho_x The probability density at a point in particles per unit volume.
+    /// @param rho_max The maximum probability density of the distribution in
+    /// particles per unit volume.
+    /// @returns The decay rate \f$\Gamma(x)\f$ in Hertz.
+    double decay_rate(double t_max, double rho_x, double rho_max) {
+        return rho_max/(t_max*rho_x);
+    }
+
 private:
     LoopLog* m_loopLog;
     RNG m_rng;
