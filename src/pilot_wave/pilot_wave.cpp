@@ -15,6 +15,7 @@
 #include "core/camera.h"
 #include "core/shaders.h"
 #include "core/path_util.h"
+#include "core/rng.h"
 
 void Controlls(float dt, GLFWwindow* window, Camera &camera) {
     double horizontalAngle = 3.13, verticalAngle = 0.0;
@@ -241,11 +242,14 @@ int main() {
     Object torus = initalizeTorus(shaderID);
     torus.m_position = glm::vec3(-3.0f, 0.0f, -3.0f);
 
+    RNG rng = RNG();
     Particles test_particles(torus.m_model, 2000);
 
     float dt;
     do {
-        test_particles.spawn_particle(1.0f, glm::vec3(0.0f, 0.0f, 0.0f));
+        float x = 100.f*(2*rng.uniform() - 1.f);
+        float y = 100.f*(2*rng.uniform() - 1.f);
+        test_particles.spawn_particle(0.1f, glm::vec3(x, 10.0f, y));
 
         // Timing
         dt = static_cast<float>(timer.timer());
