@@ -52,15 +52,15 @@ public:
     /// @param dt size of the current time step.
     void update(float dt);
     /// Create a new live particle.
-    /// If there are avaliable dead particles in the pool, one will be revived.
-    /// If there are no avaliable dead particles in the pool, a new live
-    /// Particle will be created.
+    /// If there are available dead particles in the pool, one will be revived.
+    /// If there are no available dead particles in the pool, a new live
+    /// instance of Particle will be created and added to the pool.
     /// @param decay_rate The particles decay rate.
     /// @param position The position of the new particle.
     void spawn_particle(double decay_rate, glm::vec3 position);
     /// Kill a live particle in the pool.
     /// @param index_in_live The index of the particle in the list of indices of
-    /// live particles \ref m_live_IDs.
+    /// live particles m_live_IDs.
     void kill_particle(std::size_t index_in_live);
 private:
     LoopLog* m_loopLog;

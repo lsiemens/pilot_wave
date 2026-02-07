@@ -47,7 +47,7 @@ void Particles::update(float dt) {
         m_particle_set[particle_ID].m_age += dt;
         m_particle_set[particle_ID].m_position += glm::vec3(0.0f, -dt*1.0f, 0.0f);
 
-        if (m_particle_set[particle_ID].m_age > 10.0) {
+        if (m_particle_set[particle_ID].m_age > 100.0) {
             kill_particle(i);
             continue;
         } 
@@ -55,30 +55,33 @@ void Particles::update(float dt) {
 }
 
 void Particles::spawn_particle(double decay_rate, glm::vec3 position) {
+    std::size_t particle_ID;
+
     // Use dead particles if they are avaliable, else create new particles
     if (m_dead_IDs.size() > 0) {
-        std::size_t particle_ID = m_dead_IDs.back();
+        particle_ID = m_dead_IDs.back();
         m_particle_set[particle_ID].m_decay_rate = decay_rate;
         m_particle_set[particle_ID].m_age = 0.0;
         m_particle_set[particle_ID].m_position = position;
 
-        // /todo remove
-        float max = RAND_MAX;
-        float x = 2*(std::rand()/max - 0.5);
-        float y = 2*(std::rand()/max - 0.5);
-        m_particle_set[particle_ID].m_position = glm::vec3(100*x, 10.0f, 100*y);
 
         // Revive particle
         m_dead_IDs.pop_back();
         m_live_IDs.emplace_back(particle_ID);
     } else {
         assert(m_live_IDs.size() == m_particle_set.size());
-        std::size_t particle_ID = m_live_IDs.size();
+        particle_ID = m_live_IDs.size();
 
         // Create particle
         m_particle_set.emplace_back(particle_ID, decay_rate, position);
         m_live_IDs.emplace_back(particle_ID);
     }
+
+    // /todo remove
+    float max = RAND_MAX;
+    float x = 2*(std::rand()/max - 0.5);
+    float y = 2*(std::rand()/max - 0.5);
+    m_particle_set[particle_ID].m_position = glm::vec3(100*x, 10.0f, 100*y);
 }
 
 void Particles::kill_particle(std::size_t index_in_live) {
