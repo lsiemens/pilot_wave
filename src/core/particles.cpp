@@ -1,10 +1,11 @@
 #include "core/particles.h"
 
 #include <cassert>
-#include <iostream>
 #include <algorithm>
 
-Particles::Particles(Model model, std::size_t pool_size) : m_model(model) {
+#include <glm/gtx/transform.hpp>
+
+Particles::Particles(VectorField velocity_field, Model model, std::size_t pool_size) : m_model(model) {
     m_particle_set.reserve(pool_size);
     m_dead_IDs.reserve(pool_size);
 
@@ -12,6 +13,8 @@ Particles::Particles(Model model, std::size_t pool_size) : m_model(model) {
         m_particle_set.emplace_back(i);
         m_dead_IDs.emplace_back(i);
     }
+
+    m_velocity_field = velocity_field;
 
     m_loopLog = LoopLog::getInstance();
     m_rng = RNG();
@@ -49,9 +52,9 @@ void Particles::update(float dt) {
             }
         }
 
-        // TODO remove update particle given by particle_ID
+        /// @TODO Improve the integration of the velocity field
         particle.m_age += dt;
-        particle.m_position += glm::vec3(0.0f, -dt*1.0f, 0.0f);
+        particle.m_position += dt*m_velocity_field(particle.m_position, 0.f);
     }
 }
 

@@ -103,20 +103,42 @@
 /// \f$n(x) = N\rho(x)\f$ at an exponential rate with a maximum half-life of
 /// \f$\bar{t}_\max \ln(2)\f$.
 ///
+/// @section math4 Final Notes
+/// As noted previousely I expect that using a variable decay rate will have
+/// advantages over directly sampliling the probability distribution. When the
+/// probability current is zero the distibution is static. Under these
+/// contitions all points remain in place and so for every particle the
+/// probability density at their location remains fixed. If the probability
+/// current is nonzero, then the particles should flow along with the current
+/// perserving the expected time dependent probability distrbution from the wave
+/// function. Note that for the decaying case, the decay rate of the particles
+/// is not static but must continually adjust to match the equations found
+/// earlier. Assuming that the particle trajectories could be found exactly,
+/// then the direct sampling method is much simpler. However in practice there
+/// will be numerical error during the integration of the trajectories and this
+/// will lead to a numerical diffusion causing the particles to drift from their
+/// expected paths. In the case of direct sampling there is no mechanism to
+/// activly correct for these accumulating errors and so over time the
+/// distribution can diverge from the true solution. In the case of the decaying
+/// test particles, when a given particle moves from the ideal solution due to
+/// error it will readjust its properties as if it was generated at that point
+/// and since the diribution decays towards the true solution this will add a
+/// corrective pressure so whille there may be persistant low level error, it
+/// should not be able to compound over time.
 
 
 #ifndef PARTICLES_H
 #define PARTICLES_H
 
-#include <glm/fwd.hpp>
 #include <vector>
+#include <functional>
 
 #include <glm/glm.hpp>
-#include <glm/gtx/transform.hpp>
 
 #include "core/looplog.h"
 #include "core/model.h"
 #include "core/rng.h"
+#include "core/physics_util.h"
 
 /// Represents a particle in 3D.
 /// @ingroup visualize_distributions
@@ -150,8 +172,14 @@ public:
     /// The indices of dead particles in the pool.
     std::vector<std::size_t> m_dead_IDs;
 
+    /// The velocity vector field
+    /// @param position The position of a point.
+    /// @param t_offset An offset from the current time in seconds.
+    /// @returns The velocity at the point as a glm::vec3.
+    VectorField m_velocity_field;
 
-    Particles(Model model, std::size_t pool_size);
+
+    Particles(VectorField velocity_field, Model model, std::size_t pool_size);
 
 
     /// Draw all live particles in the pool.

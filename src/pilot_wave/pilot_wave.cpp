@@ -16,6 +16,7 @@
 #include "core/shaders.h"
 #include "core/path_util.h"
 #include "core/rng.h"
+#include "core/physics_util.h"
 
 void Controlls(float dt, GLFWwindow* window, Camera &camera) {
     double horizontalAngle = 3.13, verticalAngle = 0.0;
@@ -243,7 +244,9 @@ int main() {
     torus.m_position = glm::vec3(-3.0f, 0.0f, -3.0f);
 
     RNG rng = RNG();
-    Particles test_particles(torus.m_model, 2000);
+
+    VectorField velocity = [](glm::vec3 position, double t_offset) {return glm::vec3(0.f, 1.f, 0.f);};
+    Particles test_particles(velocity, torus.m_model, 2000);
 
     float dt;
     do {
