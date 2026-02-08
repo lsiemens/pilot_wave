@@ -3,7 +3,8 @@
 #include <glm/gtx/transform.hpp>
 
 Camera::Camera(GLuint shaderID) {
-    m_matrixID = glGetUniformLocation(shaderID, "CameraTransform");
+    m_projection_matrixID = glGetUniformLocation(shaderID, "ProjectionTransform");
+    m_view_matrixID = glGetUniformLocation(shaderID, "ViewTransform");
     m_position = glm::vec3(0, 0, -12);
     m_direction = glm::vec3(1, 0, 0);
     m_up = glm::vec3(0, 1, 0);
@@ -21,6 +22,6 @@ glm::mat4 Camera::getProjectionMatrix() {
 }
 
 void Camera::update() {
-    glm::mat4 matrix = getProjectionMatrix()*getViewMatrix();
-    glUniformMatrix4fv(m_matrixID, 1, GL_FALSE, &matrix[0][0]);
+    glUniformMatrix4fv(m_projection_matrixID, 1, GL_FALSE, &getProjectionMatrix()[0][0]);
+    glUniformMatrix4fv(m_view_matrixID, 1, GL_FALSE, &getViewMatrix()[0][0]);
 }

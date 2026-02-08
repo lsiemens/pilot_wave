@@ -17,6 +17,7 @@
 #include "core/path_util.h"
 #include "core/rng.h"
 #include "core/physics_util.h"
+#include "core/geometry.h"
 
 void Controlls(float dt, GLFWwindow* window, Camera &camera) {
     double horizontalAngle = 3.13, verticalAngle = 0.0;
@@ -62,137 +63,6 @@ void Controlls(float dt, GLFWwindow* window, Camera &camera) {
     camera.m_position += delta_position;
 }
 
-glm::vec2 meshgrid(int x_resolution, int y_resolution, int vertex_index) {
-    int triangle_index = vertex_index / 3; // index of the triangle
-    int triangle_vertex_index = vertex_index % 3; // label of the vertex within the triangle
-
-    int quad_index = triangle_index / 2; // index of the quad
-    int quad_triangle_index = triangle_index % 2; // label of the triangle within the quad
-
-    int column_index = quad_index / (x_resolution - 1); // index of the column
-    int row_index = quad_index % (x_resolution - 1); // index of the row
-
-    // lower left coordinate of triangle on the unit square
-    glm::vec2 unit_pos;
-    unit_pos.x = static_cast<float>(row_index)/static_cast<float>(x_resolution - 1);
-    unit_pos.y = static_cast<float>(column_index)/static_cast<float>(y_resolution - 1);
-
-    // offset for the upper right vertex
-    if (triangle_vertex_index == 1) {
-        unit_pos.x += 1.0f/static_cast<float>(x_resolution - 1);
-        unit_pos.y += 1.0f/static_cast<float>(y_resolution - 1);
-    }
-
-    // offsets for the off diagonal vertex. The spesific offset
-    // is dependent on if it is the upper or lower triangle
-    if (triangle_vertex_index == 2){
-        if (quad_triangle_index == 0) {
-            unit_pos.x += 1.0f/static_cast<float>(x_resolution - 1);
-        } else {
-            unit_pos.y += 1.0f/static_cast<float>(y_resolution - 1);
-        }
-    }
-    return unit_pos;
-}
-
-Object initalizeSurface(GLuint shaderID) {
-    constexpr int x_resolution = 100;
-    constexpr int y_resolution = 100;
-    constexpr int num_vertices = (x_resolution - 1)*(y_resolution - 1)*2*3; // (x_resolution - 1)*(y_resolution - 1) quads, 2 triangles per quad, 3 points per triangle
-
-    GLfloat g_vertex_buffer_data[num_vertices*3];
-    GLfloat g_color_buffer_data[num_vertices*3];
-
-    for (int vertex_index = 0; vertex_index < num_vertices; vertex_index++) {
-        glm::vec2 unit_pos = meshgrid(x_resolution, y_resolution, vertex_index);
-
-        float x = 5*(unit_pos.x - 0.5f);
-        float y = 5*(unit_pos.y - 0.5f);
-
-        g_vertex_buffer_data[0 + 3*vertex_index] = x;
-        g_vertex_buffer_data[2 + 3*vertex_index] = y;
-        g_vertex_buffer_data[1 + 3*vertex_index] = std::exp(-(x*x + y*y));
-
-        g_color_buffer_data[0 + 3*vertex_index] = unit_pos.x;
-        g_color_buffer_data[1 + 3*vertex_index] = unit_pos.y;
-        g_color_buffer_data[2 + 3*vertex_index] = std::exp(-(x*x + y*y));
-    }
-
-    Model model = Model(shaderID);
-    model.setVertexBuffer(g_vertex_buffer_data, sizeof(g_vertex_buffer_data));
-    model.setColorBuffer(g_color_buffer_data, sizeof(g_color_buffer_data));
-    Object surface = Object(model);
-    return surface;
-}
-
-Object initalizeSphere(GLuint shaderID) {
-    constexpr int x_resolution = 32; // rows
-    constexpr int y_resolution = 16; // columns
-    constexpr int num_vertices = (x_resolution - 1)*(y_resolution - 1)*2*3; // (x_resolution - 1)*(y_resolution - 1) quads, 2 triangles per quad, 3 points per triangle
-
-    GLfloat g_vertex_buffer_data[num_vertices*3];
-    GLfloat g_color_buffer_data[num_vertices*3];
-
-    for (int vertex_index = 0; vertex_index < num_vertices; vertex_index++) {
-        glm::vec2 unit_pos = meshgrid(x_resolution, y_resolution, vertex_index);
-
-        float theta = 6.28f*unit_pos.x;
-        float phi = 3.14f*unit_pos.y;
-
-        float x = std::sin(phi)*std::cos(theta);
-        float y = std::sin(phi)*std::sin(theta);
-        float z = std::cos(phi);
-
-        g_vertex_buffer_data[0 + 3*vertex_index] = x;
-        g_vertex_buffer_data[2 + 3*vertex_index] = y;
-        g_vertex_buffer_data[1 + 3*vertex_index] = z;
-
-        g_color_buffer_data[0 + 3*vertex_index] = unit_pos.x;
-        g_color_buffer_data[1 + 3*vertex_index] = unit_pos.y;
-        g_color_buffer_data[2 + 3*vertex_index] = 0.0f;
-    }
-
-    Model model = Model(shaderID);
-    model.setVertexBuffer(g_vertex_buffer_data, sizeof(g_vertex_buffer_data));
-    model.setColorBuffer(g_color_buffer_data, sizeof(g_color_buffer_data));
-    Object sphere = Object(model);
-    return sphere;
-}
-
-Object initalizeTorus(GLuint shaderID) {
-    constexpr int x_resolution = 100; // rows
-    constexpr int y_resolution = 100; // columns
-    constexpr int num_vertices = (x_resolution - 1)*(y_resolution - 1)*2*3; // (x_resolution - 1)*(y_resolution - 1) quads, 2 triangles per quad, 3 points per triangle
-
-    GLfloat g_vertex_buffer_data[num_vertices*3];
-    GLfloat g_color_buffer_data[num_vertices*3];
-
-    for (int vertex_index = 0; vertex_index < num_vertices; vertex_index++) {
-        glm::vec2 unit_pos = meshgrid(x_resolution, y_resolution, vertex_index);
-
-        float theta = 6.28f*unit_pos.x;
-        float phi = 6.28f*unit_pos.y;
-
-        float x = (1.0f + 0.5f*std::cos(theta))*std::cos(phi);
-        float y = (1.0f + 0.5f*std::cos(theta))*std::sin(phi);
-        float z = 0.5f*std::sin(theta);
-
-        g_vertex_buffer_data[0 + 3*vertex_index] = x;
-        g_vertex_buffer_data[2 + 3*vertex_index] = y;
-        g_vertex_buffer_data[1 + 3*vertex_index] = z;
-
-        g_color_buffer_data[0 + 3*vertex_index] = unit_pos.x;
-        g_color_buffer_data[1 + 3*vertex_index] = unit_pos.y;
-        g_color_buffer_data[2 + 3*vertex_index] = 0.0f;
-    }
-
-    Model model = Model(shaderID);
-    model.setVertexBuffer(g_vertex_buffer_data, sizeof(g_vertex_buffer_data));
-    model.setColorBuffer(g_color_buffer_data, sizeof(g_color_buffer_data));
-    Object torus = Object(model);
-    return torus;
-}
-
 int main() {
     LoopLog* loopLog = LoopLog::getInstance();
     if (!glfwInit()) {
@@ -202,6 +72,7 @@ int main() {
 
     GLFWwindow* window;
     int width=1024, height=768;
+    glfwWindowHint(GLFW_SAMPLES, 4); // set multi sampling factor
     window = glfwCreateWindow( width, height, "Pilot Wave", NULL, NULL);
     if (window == NULL) {
         std::cerr << "Failed to create GLFW window.\n";
@@ -219,6 +90,7 @@ int main() {
     glClearColor(.6f, .65f, .7f, 1.f);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+    glEnable(GL_MULTISAMPLE); // enable multi sampling
 
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
@@ -233,26 +105,27 @@ int main() {
 
     AdvancedTimer timer = AdvancedTimer();
     Camera camera = Camera(shaderID);
-    Object surface = initalizeSurface(shaderID);
 
-    Object sphere = initalizeSphere(shaderID);
+    Object sphere = Object(make_sphere(1.0f, 100, 100, shaderID));
     sphere.m_position = glm::vec3(3.0f, 0.0f, -3.0f);
     sphere.m_velocity = glm::vec3(0.0f, 10.0f, 0.0f);
     sphere.m_acceleration = glm::vec3(0.0f, -9.81f, 0.0f);
 
-    Object torus = initalizeTorus(shaderID);
+    Object torus = Object(make_torus(0.5f, 1.f, 100, 100, shaderID));
     torus.m_position = glm::vec3(-3.0f, 0.0f, -3.0f);
 
     RNG rng = RNG();
 
-    VectorField velocity = [](glm::vec3 position, double t_offset) {return glm::vec3(0.f, 1.f, 0.f);};
-    Particles test_particles(velocity, torus.m_model, 2000);
+    VectorField velocity = [](glm::vec3 position, double t_offset) {return glm::vec3(0.f, -1.f, 0.f);};
+    Particles test_particles(velocity, make_tetrahedron(.1f, shaderID), 2000);
 
     float dt;
     do {
-        float x = 100.f*(2*rng.uniform() - 1.f);
-        float y = 100.f*(2*rng.uniform() - 1.f);
-        test_particles.spawn_particle(0.1f, glm::vec3(x, 10.0f, y));
+        for (int i = 0; i < 300; i++) {
+            float x = 100.f*static_cast<float>(2*rng.uniform() - 1.f);
+            float y = 100.f*static_cast<float>(2*rng.uniform() - 1.f);
+            test_particles.spawn_particle(0.1f, glm::vec3(x, 10.0f, y));
+        }
 
         // Timing
         dt = static_cast<float>(timer.timer());
@@ -266,12 +139,10 @@ int main() {
         glUseProgram(shaderID);
         camera.update();
 
-        surface.update(dt);
         sphere.update(dt);
         torus.update(dt);
         test_particles.update(dt);
 
-        surface.drawObject();
         sphere.drawObject();
         torus.drawObject();
         test_particles.drawParticles();

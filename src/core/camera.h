@@ -13,7 +13,8 @@ public:
     glm::vec3 m_direction;
     glm::vec3 m_up;
     float m_FoV, m_aspectRatio;
-    GLuint m_matrixID;
+    GLuint m_projection_matrixID;
+    GLuint m_view_matrixID;
 
     Camera(GLuint shaderID);
     glm::mat4 getViewMatrix();
