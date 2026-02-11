@@ -18,6 +18,7 @@
 #include "core/rng.h"
 #include "core/physics_util.h"
 #include "core/geometry.h"
+#include "quantum/square_well.h"
 
 void Controlls(float dt, GLFWwindow* window, Camera &camera) {
     double horizontalAngle = 3.13, verticalAngle = 0.0;

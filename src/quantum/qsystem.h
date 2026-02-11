@@ -2,16 +2,18 @@
 #define QSYSTEM_H
 
 #include <limits>
-#include <vector>
+#include <array>
 #include <concepts>
 #include <complex>
+#include <stdexcept>
 
 #include <glm/glm.hpp>
 
-using Coefficients = std::vector<std::complex<double>>;
-
 // Only here temeraily for testing
 using namespace std::complex_literals;
+
+template<std::size_t N_STATES>
+using Coefficients = std::array<std::complex<double>, N_STATES>;
 
 template <typename QN>
 concept IsQuantumNumbers = 
@@ -22,7 +24,7 @@ concept IsQuantumNumbers =
 template <typename P>
 using QN_type = typename P::QuantumNumbers;
 
-template <typename P>
+template <typename P, std::size_t N_STATES>
 concept IsPotential = 
     requires(P potential) {
         typename P::QuantumNumbers;
@@ -32,61 +34,35 @@ concept IsPotential =
         { potential.V(position) } -> std::same_as<double>;
         { potential.energy_eigenvalue(quantum_numbers) } -> std::same_as<double>;
         { potential.energy_eigenstate(quantum_numbers, position) } -> std::same_as<double>;
+        { potential.template get_levels<N_STATES>() } -> std::same_as<std::array<QN_type<P>, N_STATES>>;
     };
 
-
-template <IsPotential Potential>
+template <typename Potential, std::size_t N_STATES>
+requires IsPotential<Potential, N_STATES>
 class QSystem {
 public:
     using QuantumNumbers = QN_type<Potential>;
 
     const Potential m_potential;
-    Coefficients m_coefficients;
+    const std::array<QuantumNumbers, N_STATES> m_levels;
 
-    QSystem(const Potential& potential, const Coefficients& coefficients) : m_potential(potential), m_coefficients(coefficients) {}
+    QSystem(const Potential& potential) : m_potential(potential), m_levels(potential.template get_levels<N_STATES>()) {}
 
-    double wave_function(glm::vec3 position) const {
-        double value = 0.;
-        for (std::size_t i = 0; i < m_coefficients.size(); i++) {
-            QuantumNumbers qn = QuantumNumbers(i + 1);
-            value += m_coefficients[i]*m_potential.energy_eigenstate(qn, position);
+    double state(std::size_t n, glm::vec3 position) const {
+        if (n >= N_STATES) {
+            throw std::out_of_range("State (n = " + std::to_string(n) + ") out of range [0, N_STATES - 1] with N_STATES = " + std::to_string(N_STATES) + ".");
         }
-        return value;
+
+        return m_potential.energy_eigenstate(m_levels[n], position);
+    }
+
+    double energy(std::size_t n) const {
+        if (n >= N_STATES) {
+            throw std::out_of_range("State (n = " + std::to_string(n) + ") out of range [0, N_STATES - 1] with N_STATES = " + std::to_string(N_STATES) + ".");
+        }
+
+        return m_potential.energy_eigenvalue(m_levels[n]);
     }
 };
-
-
-class MyPotential {
-public:
-    struct QuantumNumbers {
-        int n;
-        constexpr bool isValid() const {
-            return (n > 0);
-        }
-    };
-
-    constexpr double V(glm::vec3 position) const {
-        if ((0. <= position.x) and (position.x < 1.)) {
-            return 0.;
-        } else {
-            return std::numeric_limits<double>::infinity();
-        }
-    }
-
-    constexpr double energy_eigenvalue(QuantumNumbers quantum_numbers) const {
-        assert(quantum_numbers.isValid());
-
-        return 1.0*static_cast<double>(quantum_numbers.n*quantum_numbers.n);
-    }
-
-    constexpr double energy_eigenstate(QuantumNumbers quantum_numbers, glm::vec3 position) const {
-        assert(quantum_numbers.isValid());
-
-        return std::sin(static_cast<double>(quantum_numbers.n)*position.x);
-    }
-};
-
-// only here temperaily for test
-QSystem<MyPotential> A(MyPotential(), {1. + 0.i, 0. + 2.i, 3., 4.i});
 
 #endif
