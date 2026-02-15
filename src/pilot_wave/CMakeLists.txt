@@ -1,5 +1,5 @@
 add_executable(pilot_wave
-    pilot_wave.cpp)
+    pilot_wave.cpp qparticles.cpp)
 
 target_sources(pilot_wave PRIVATE
     $<TARGET_OBJECTS:pilot_wave_core_obj>)
@@ -10,6 +10,7 @@ target_link_libraries(pilot_wave PRIVATE
     glfw
     
     pilot_wave_core_obj
+    pilot_wave_quantum_obj
     pilot_wave_warnings
     pilot_wave_assets)
 

@@ -1,5 +1,6 @@
 #include <cmath>
 #include <iostream>
+#include <memory>
 
 // keep this before all other OpenGL libraries
 #define GLEW_STATIC
@@ -11,14 +12,13 @@
 #include "core/frame_timer.h"
 #include "core/model.h"
 #include "core/object.h"
-#include "core/particles.h"
 #include "core/camera.h"
 #include "core/shaders.h"
 #include "core/path_util.h"
-#include "core/rng.h"
-#include "core/physics_util.h"
 #include "core/geometry.h"
+
 #include "quantum/square_well.h"
+#include "pilot_wave/qparticles.h"
 
 void Controlls(float dt, GLFWwindow* window, Camera &camera) {
     double horizontalAngle = 3.13, verticalAngle = 0.0;
@@ -115,19 +115,11 @@ int main() {
     Object torus = Object(make_torus(0.5f, 1.f, 100, 100, shaderID));
     torus.m_position = glm::vec3(-3.0f, 0.0f, -3.0f);
 
-    RNG rng = RNG();
-
-    VectorField velocity = [](glm::vec3 position, double t_offset) {return glm::vec3(0.f, -1.f, 0.f);};
-    Particles test_particles(velocity, make_tetrahedron(.1f, shaderID), 2000);
+    QParticles qparticles(std::make_unique<SquareWell>(2.), shaderID);
+    qparticles.m_qstate_uptr->set_energy_level(100);
 
     float dt;
     do {
-        for (int i = 0; i < 300; i++) {
-            float x = 100.f*static_cast<float>(2*rng.uniform() - 1.f);
-            float y = 100.f*static_cast<float>(2*rng.uniform() - 1.f);
-            test_particles.spawn_particle(0.1f, glm::vec3(x, 10.0f, y));
-        }
-
         // Timing
         dt = static_cast<float>(timer.timer());
         loopLog->flush();
@@ -142,11 +134,11 @@ int main() {
 
         sphere.update(dt);
         torus.update(dt);
-        test_particles.update(dt);
+        qparticles.update(dt);
 
         sphere.drawObject();
         torus.drawObject();
-        test_particles.drawParticles();
+        qparticles.draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
