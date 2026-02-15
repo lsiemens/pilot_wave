@@ -17,3 +17,18 @@ double RNG::uniform() {
 double RNG::normal() {
     return m_normal(m_engine);
 }
+
+/// Sample from Poisson distribution using inverse sampling
+std::size_t RNG::poisson(double lambda) {
+    std::size_t n = 0;
+    double p_n = std::exp(-lambda);
+    double cumsum_p_n = p_n;
+    double sample = uniform();
+    
+    while (sample > cumsum_p_n) {
+        n++;
+        p_n *= lambda/static_cast<double>(n);
+        cumsum_p_n += p_n;
+    }
+    return n;
+}

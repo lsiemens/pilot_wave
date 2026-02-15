@@ -11,6 +11,7 @@ public:
 
     double uniform();
     double normal();
+    std::size_t poisson(double lambda);
 
 private:
     std::uniform_real_distribution<double> m_uniform;

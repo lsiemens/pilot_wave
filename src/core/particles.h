@@ -138,17 +138,20 @@
 #include "core/looplog.h"
 #include "core/model.h"
 #include "core/rng.h"
-#include "core/physics_util.h"
+#include "core/math_util.h"
 
 /// Represents a particle in 3D.
 /// @ingroup visualize_distributions
 struct Particle {
     /// The particles ID should be its index in the array of particles.
     const std::size_t m_ID;
+
     /// The decay rate for this particle.
     double m_decay_rate = 0.0;
+
     /// The current age of the particle.
     double m_age = 0.0;
+
     /// The current position of the particle.
     glm::vec3 m_position = glm::vec3(0.0f);
 
@@ -172,14 +175,7 @@ public:
     /// The indices of dead particles in the pool.
     std::vector<std::size_t> m_dead_IDs;
 
-    /// The velocity vector field
-    /// @param position The position of a point.
-    /// @param t_offset An offset from the current time in seconds.
-    /// @returns The velocity at the point as a glm::vec3.
-    VectorField m_velocity_field;
-
-
-    Particles(VectorField velocity_field, Model model, std::size_t pool_size);
+    Particles(Model model, std::size_t pool_size);
 
 
     /// Draw all live particles in the pool.
