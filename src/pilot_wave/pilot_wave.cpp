@@ -20,7 +20,10 @@
 #include "quantum/square_well.h"
 #include "pilot_wave/qparticles.h"
 
-void Controlls(float dt, GLFWwindow* window, Camera &camera) {
+bool press_q = false;
+bool press_e = false;
+
+void Controlls(float dt, GLFWwindow* window, Camera &camera, QParticles& qparticles) {
     double horizontalAngle = 3.13, verticalAngle = 0.0;
     float speed = 3.f, mouseSensitivity = 0.001f;
 
@@ -40,28 +43,50 @@ void Controlls(float dt, GLFWwindow* window, Camera &camera) {
     glm::vec3 up = glm::cross(right, direction);
     glm::vec3 delta_position = glm::vec3(0.f, 0.f, 0.f);
 
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
         delta_position = dt*direction*speed;
     }
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
         delta_position = -dt*direction*speed;
     }
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         delta_position = dt*right*speed;
     }
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
         delta_position = -dt*right*speed;
     }
-    if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
         delta_position = dt*up*speed;
     }
-    if (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {
         delta_position = -dt*up*speed;
     }
 
     camera.m_direction = direction;
     camera.m_up = up;
     camera.m_position += delta_position;
+
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+        if (not press_e) {
+            std::size_t energy_level = qparticles.m_qstate_uptr->get_energy_level();
+            qparticles.m_qstate_uptr->set_energy_level(energy_level + 1);
+        }
+        press_e = true;
+    } else {
+        press_e = false;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+        if (not press_q) {
+            std::size_t energy_level = qparticles.m_qstate_uptr->get_energy_level();
+            if (energy_level > 0) {
+                qparticles.m_qstate_uptr->set_energy_level(energy_level - 1);
+            }
+        }
+        press_q = true;
+    } else {
+        press_q = false;
+    }
 }
 
 int main() {
@@ -116,7 +141,7 @@ int main() {
     torus.m_position = glm::vec3(-3.0f, 0.0f, -3.0f);
 
     QParticles qparticles(std::make_unique<SquareWell>(2.), shaderID);
-    qparticles.m_qstate_uptr->set_energy_level(100);
+    qparticles.m_qstate_uptr->set_energy_level(1);
 
     float dt;
     do {
@@ -127,7 +152,7 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //Camera
-        Controlls(dt, window, camera);
+        Controlls(dt, window, camera, qparticles);
 
         glUseProgram(shaderID);
         camera.update();
