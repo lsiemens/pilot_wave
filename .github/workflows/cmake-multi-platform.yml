@@ -24,8 +24,7 @@ jobs:
       #
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
-        #os: [ubuntu-latest, ubuntu-22.04, ubuntu-20.04]
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, ubuntu-22.04, ubuntu-20.04]
         build_type: [Release, Debug]
         #c_compiler: [gcc, clang]
         c_compiler: [gcc]
@@ -36,15 +35,15 @@ jobs:
           #- os: ubuntu-latest
           #  c_compiler: clang
           #  cpp_compiler: clang++
-          #- os: ubuntu-22.04
-          #  c_compiler: gcc
-          #  cpp_compiler: g++
+          - os: ubuntu-22.04
+            c_compiler: gcc
+            cpp_compiler: g++
           #- os: ubuntu-22.04
           #  c_compiler: clang
           #  cpp_compiler: clang++
-          #- os: ubuntu-20.04
-          #  c_compiler: gcc
-          #  cpp_compiler: g++
+          - os: ubuntu-20.04
+            c_compiler: gcc
+            cpp_compiler: g++
           #- os: ubuntu-20.04
           #  c_compiler: clang
           #  cpp_compiler: clang++
