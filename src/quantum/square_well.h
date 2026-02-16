@@ -13,13 +13,13 @@
 class SquareWell : public QState {
 public:
     struct QuantumNumbers {
-        std::size_t n_x = 1;
-        std::size_t n_y = 1;
-        std::size_t n_z = 1;
+        std::size_t m_n_x;
+        std::size_t m_n_y;
+        std::size_t m_n_z;
 
-        bool isValid() const {
-            return ((n_x > 0) and (n_y > 0) and (n_z > 0));
-        }
+        QuantumNumbers();
+        QuantumNumbers(std::size_t n_x, std::size_t n_y, std::size_t n_z);
+        bool isValid() const;
     };
 
     SquareWell(double width);

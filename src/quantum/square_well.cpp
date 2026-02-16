@@ -8,6 +8,22 @@ double dsin3_dx(double kx, double x, double ky, double y, double kz, double z) {
     return kx*std::cos(kx*x)*std::sin(ky*y)*std::sin(kz*z);
 }
 
+SquareWell::QuantumNumbers::QuantumNumbers() {
+    m_n_x = 1;
+    m_n_y = 1;
+    m_n_z = 1;
+}
+
+SquareWell::QuantumNumbers::QuantumNumbers(std::size_t n_x, std::size_t n_y, std::size_t n_z) {
+    m_n_x = n_x;
+    m_n_y = n_y;
+    m_n_z = n_z;
+}
+
+bool SquareWell::QuantumNumbers::isValid() const {
+    return ((m_n_x > 0) and (m_n_y > 0) and (m_n_z > 0));
+}
+
 SquareWell::SquareWell(double width) {
     m_width = width;
     m_origin = glm::dvec3(width/2., width/2., width/2.);
@@ -37,9 +53,9 @@ double SquareWell::psi_n(glm::dvec3 position, std::size_t energy_level) const {
         return 0.;
     }
 
-    double k_x = PI_D*static_cast<double>(quantum_numbers.n_x)/m_width;
-    double k_y = PI_D*static_cast<double>(quantum_numbers.n_y)/m_width;
-    double k_z = PI_D*static_cast<double>(quantum_numbers.n_z)/m_width;
+    double k_x = PI_D*static_cast<double>(quantum_numbers.m_n_x)/m_width;
+    double k_y = PI_D*static_cast<double>(quantum_numbers.m_n_y)/m_width;
+    double k_z = PI_D*static_cast<double>(quantum_numbers.m_n_z)/m_width;
 
     return m_norm*std::sin(k_x*position.x)
                  *std::sin(k_y*position.y)
@@ -62,9 +78,9 @@ glm::dvec3 SquareWell::grad_psi_n(glm::dvec3 position, std::size_t energy_level)
         return glm::dvec3(0., 0., 0.);
     }
 
-    double k_x = PI_D*static_cast<double>(quantum_numbers.n_x)/m_width;
-    double k_y = PI_D*static_cast<double>(quantum_numbers.n_y)/m_width;
-    double k_z = PI_D*static_cast<double>(quantum_numbers.n_z)/m_width;
+    double k_x = PI_D*static_cast<double>(quantum_numbers.m_n_x)/m_width;
+    double k_y = PI_D*static_cast<double>(quantum_numbers.m_n_y)/m_width;
+    double k_z = PI_D*static_cast<double>(quantum_numbers.m_n_z)/m_width;
 
     glm::dvec3 grad_psi;
     grad_psi.x = m_norm*dsin3_dx(k_x, position.x, k_y, position.y, k_z, position.z);
@@ -109,9 +125,9 @@ double SquareWell::energy_eigenvalue(QuantumNumbers quantum_numbers) const {
         throw std::out_of_range("Invalid quantum numbers");
     }
 
-    double k_x = PI_D*static_cast<double>(quantum_numbers.n_x)/m_width;
-    double k_y = PI_D*static_cast<double>(quantum_numbers.n_y)/m_width;
-    double k_z = PI_D*static_cast<double>(quantum_numbers.n_z)/m_width;
+    double k_x = PI_D*static_cast<double>(quantum_numbers.m_n_x)/m_width;
+    double k_y = PI_D*static_cast<double>(quantum_numbers.m_n_y)/m_width;
+    double k_z = PI_D*static_cast<double>(quantum_numbers.m_n_z)/m_width;
 
     double k_sqr = k_x*k_x + k_y*k_y + k_z*k_z;
     return m_hbar*m_hbar*k_sqr/(2.*m_m_e);
