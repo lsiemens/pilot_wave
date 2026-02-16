@@ -11,7 +11,8 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # setup OpenGL GLEW and GLFW
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
-find_package(glfw3 CONFIG)
+find_package(glfw3 CONFIG REQUIRED)
+find_package(glm REQUIRED)
 
 option(ENABLE_WARNINGS "Enable compiler warnings" ON)
 option(STRICT_WARNINGS "Enable strict compiler warnings" ON)

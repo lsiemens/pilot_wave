@@ -8,6 +8,7 @@ target_link_libraries(pilot_wave PRIVATE
     OpenGL::GL
     GLEW::GLEW
     glfw
+    glm::glm
     
     pilot_wave_core_obj
     pilot_wave_quantum_obj
