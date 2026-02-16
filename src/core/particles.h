@@ -183,7 +183,7 @@ public:
 
     /// Run an update for all live particles in the pool.
     /// @param dt size of the current time step.
-    void update(float dt);
+    void update(double dt);
 
     /// Create a new live particle.
     /// If there are available dead particles in the pool, one will be revived.

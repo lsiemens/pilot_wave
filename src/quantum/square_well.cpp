@@ -83,7 +83,8 @@ void SquareWell::find_energy_levels() {
 
     std::cout << "Find energy levels: # states " << n_states << std::endl;
 
-    std::size_t n_max = static_cast<std::size_t>(std::sqrt(3.) + std::ceil(std::pow(6.*n_states/3.14, 1/3.)));
+    // TODO improve and clarify this huristic
+    std::size_t n_max = static_cast<std::size_t>(std::sqrt(3.) + std::ceil(std::pow(6.*static_cast<double>(n_states)/3.14, 1/3.)));
     std::vector<QuantumNumbers> initial_set(n_max*n_max*n_max);
 
     for (std::size_t i = 0; i < n_max; i++) {

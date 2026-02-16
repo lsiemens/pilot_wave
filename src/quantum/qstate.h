@@ -182,10 +182,10 @@ protected:
     QState() = default;
 
     /// domain width
-    double m_width;
+    double m_width = 0.;
 
     /// domain center
-    glm::dvec3 m_origin;
+    glm::dvec3 m_origin = glm::dvec3(0., 0., 0.);
 
 private:
     /// Elapsed time.
@@ -196,26 +196,26 @@ private:
     /// The systems energy levels.
     /// An ordered list of energy levels for use in the time dependent component
     /// of the wavefunction. The energy is given in units of \f$[E_h]\f$.
-    std::vector<double> m_energy_eigenvalues;
+    std::vector<double> m_energy_eigenvalues = {};
 
     /// The initial state coefficients.
     /// A list of the initial complex coefficients ordered by the energy level.
-    std::vector<std::complex<double>> m_coeff;
+    std::vector<std::complex<double>> m_coeff = {};
 
     /// The time dependant state coefficients.
     /// A list of the time dependant complex coefficients orderd by the energy
     /// level.
-    std::vector<std::complex<double>> m_coeff_t;
+    std::vector<std::complex<double>> m_coeff_t = {};
 
     /// The energy level of the current energy eigenstate.
     /// The index of the energy level for the system. Used if m_num_states is
     /// zero.
-    std::size_t m_energy_level;
+    std::size_t m_energy_level = 0;
 
     /// The number of defined state coefficients.
     /// This is given by m_coeff.size() and determines if the system is
     /// representing a time depended state or one of the energy eigenstates.
-    std::size_t m_num_states;
+    std::size_t m_num_states = 0;
 };
 
 #endif

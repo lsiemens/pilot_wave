@@ -27,7 +27,7 @@ void Particles::drawParticles() {
     }
 }
 
-void Particles::update(float dt) {
+void Particles::update(double dt) {
     m_loopLog->m_log << "Particle system | pool size:" << m_particle_set.size() << "\n";
     m_loopLog->m_log << "\tparticles state [live | dead]: [" << m_live_IDs.size() << " | " << m_dead_IDs.size() << "]\n";
 

@@ -10,7 +10,7 @@ QParticles::QParticles(std::unique_ptr<QState> qstate, GLuint shaderID)
         : m_qstate_uptr(std::move(qstate)) {
 
     double width = m_qstate_uptr->get_width();
-    Model model = make_tetrahedron(m_particle_size*width, shaderID);
+    Model model = make_tetrahedron(m_particle_size*static_cast<float>(width), shaderID);
 
     m_particles_uptr = std::make_unique<Particles>(model, m_target_particle_num);
 
@@ -31,9 +31,9 @@ void QParticles::update(double dt) {
     std::size_t num_new_particles = m_rng.poisson(lambda);
     for (std::size_t i = 0; i < num_new_particles; i++) {
         glm::vec3 offset;
-        offset.x = width*(m_rng.uniform() - 0.5);
-        offset.y = width*(m_rng.uniform() - 0.5);
-        offset.z = width*(m_rng.uniform() - 0.5);
+        offset.x = static_cast<float>(width*(m_rng.uniform() - 0.5));
+        offset.y = static_cast<float>(width*(m_rng.uniform() - 0.5));
+        offset.z = static_cast<float>(width*(m_rng.uniform() - 0.5));
         m_particles_uptr->spawn_particle(0.f, origin + offset);
     }
     m_loopLog->m_log << "QParticles | dt*spawn_rate: [" << lambda << "]\n";

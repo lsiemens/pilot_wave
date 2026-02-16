@@ -13,9 +13,9 @@
 class SquareWell : public QState {
 public:
     struct QuantumNumbers {
-        int n_x = 1;
-        int n_y = 1;
-        int n_z = 1;
+        std::size_t n_x = 1;
+        std::size_t n_y = 1;
+        std::size_t n_z = 1;
 
         bool isValid() const {
             return ((n_x > 0) and (n_y > 0) and (n_z > 0));
