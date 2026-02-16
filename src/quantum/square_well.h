@@ -8,6 +8,8 @@
 
 #include "quantum/qstate.h"
 
+/// Impliments the QState interface for the infinite square well potential.
+/// @ingroup quantum_mechanics
 class SquareWell : public QState {
 public:
     struct QuantumNumbers {
