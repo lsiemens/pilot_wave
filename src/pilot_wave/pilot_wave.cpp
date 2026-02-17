@@ -19,75 +19,7 @@
 
 #include "quantum/square_well.h"
 #include "pilot_wave/qparticles.h"
-
-bool press_q = false;
-bool press_e = false;
-
-void Controlls(float dt, GLFWwindow* window, Camera &camera, QParticles& qparticles) {
-    double horizontalAngle = 3.13, verticalAngle = 0.0;
-    float speed = 3.f, mouseSensitivity = 0.001f;
-
-    double xpos, ypos;
-    glfwGetCursorPos(window, &xpos, &ypos);
-    horizontalAngle = -mouseSensitivity*xpos;
-    verticalAngle = mouseSensitivity*ypos;
-
-    glm::vec3 direction = glm::vec3(std::cos(verticalAngle)*std::sin(horizontalAngle),
-                     std::sin(verticalAngle),
-                     std::cos(verticalAngle)*std::cos(horizontalAngle));
-
-    glm::vec3 right = glm::vec3(std::sin(horizontalAngle - 3.14f/2.f),
-                     0.f,
-                     std::cos(horizontalAngle - 3.14/2.f));
-
-    glm::vec3 up = glm::cross(right, direction);
-    glm::vec3 delta_position = glm::vec3(0.f, 0.f, 0.f);
-
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        delta_position = dt*direction*speed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        delta_position = -dt*direction*speed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        delta_position = dt*right*speed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        delta_position = -dt*right*speed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-        delta_position = dt*up*speed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {
-        delta_position = -dt*up*speed;
-    }
-
-    camera.m_direction = direction;
-    camera.m_up = up;
-    camera.m_position += delta_position;
-
-    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
-        if (not press_e) {
-            std::size_t energy_level = qparticles.m_qstate_uptr->get_energy_level();
-            qparticles.m_qstate_uptr->set_energy_level(energy_level + 1);
-        }
-        press_e = true;
-    } else {
-        press_e = false;
-    }
-
-    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
-        if (not press_q) {
-            std::size_t energy_level = qparticles.m_qstate_uptr->get_energy_level();
-            if (energy_level > 0) {
-                qparticles.m_qstate_uptr->set_energy_level(energy_level - 1);
-            }
-        }
-        press_q = true;
-    } else {
-        press_q = false;
-    }
-}
+#include "pilot_wave/controls.h"
 
 int main() {
     LoopLog* loopLog = LoopLog::getInstance();
@@ -130,7 +62,7 @@ int main() {
     GLuint shaderID = LoadShaders("assets/vertex.glsl", "assets/fragment.glsl");
 
     AdvancedTimer timer = AdvancedTimer();
-    Camera camera = Camera(shaderID);
+    std::shared_ptr<Camera> camera_sptr = std::make_shared<Camera>(shaderID);
 
     Object sphere = Object(make_sphere(1.0f, 100, 100, shaderID));
     sphere.m_position = glm::vec3(3.0f, 0.0f, -3.0f);
@@ -140,8 +72,11 @@ int main() {
     Object torus = Object(make_torus(0.5f, 1.f, 100, 100, shaderID));
     torus.m_position = glm::vec3(-3.0f, 0.0f, -3.0f);
 
-    QParticles qparticles(std::make_unique<SquareWell>(2.), shaderID);
-    qparticles.m_qstate_uptr->set_energy_level(1);
+    auto qstate_uptr = std::make_unique<SquareWell>(2.);
+    std::shared_ptr<QParticles> qparticles_sptr = std::make_shared<QParticles>(std::move(qstate_uptr), shaderID);
+    qparticles_sptr->m_qstate_uptr->set_energy_level(1);
+
+    Controls controls = Controls(window, camera_sptr, qparticles_sptr);
 
     float dt;
     do {
@@ -152,18 +87,18 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //Camera
-        Controlls(dt, window, camera, qparticles);
+        controls.update(dt);
 
         glUseProgram(shaderID);
-        camera.update();
+        camera_sptr->update();
 
         sphere.update(dt);
         torus.update(dt);
-        qparticles.update(dt);
+        qparticles_sptr->update(dt);
 
         sphere.drawObject();
         torus.drawObject();
-        qparticles.draw();
+        qparticles_sptr->draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

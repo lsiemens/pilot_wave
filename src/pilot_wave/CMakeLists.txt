@@ -1,5 +1,6 @@
 add_executable(pilot_wave
-    pilot_wave.cpp qparticles.cpp)
+    pilot_wave.cpp qparticles.cpp
+    controls.cpp)
 
 target_sources(pilot_wave PRIVATE
     $<TARGET_OBJECTS:pilot_wave_core_obj>)
