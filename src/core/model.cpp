@@ -2,6 +2,7 @@
 
 Model::Model(GLuint shaderID) {
     m_matrixID = glGetUniformLocation(shaderID, "ModelTransform");
+    m_ageID = glGetUniformLocation(shaderID, "Age");
 }
 
 void Model::releaseBuffers() {
@@ -22,8 +23,9 @@ void Model::setColorBuffer(GLfloat data[], GLsizei bufferSize) {
     glBufferData(GL_ARRAY_BUFFER, bufferSize, data, GL_STATIC_DRAW);
 }
 
-void Model::drawModel(glm::mat4 modelSpaceToWorldSpace) {
+void Model::drawModel(glm::mat4 modelSpaceToWorldSpace, float age) {
     glUniformMatrix4fv(m_matrixID, 1, GL_FALSE, &modelSpaceToWorldSpace[0][0]);
+    glUniform1f(m_ageID, age); 
 
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexbuffer);

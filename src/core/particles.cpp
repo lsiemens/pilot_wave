@@ -23,7 +23,8 @@ void Particles::drawParticles() {
         std::size_t particle_ID = m_live_IDs[i];
 
         // draw particle given by particle_ID
-        this->m_model.drawModel(glm::translate(glm::mat4(1.f), m_particle_set[particle_ID].m_position));
+        glm::mat4 translation = glm::translate(glm::mat4(1.f), m_particle_set[particle_ID].m_position);
+        this->m_model.drawModel(translation, m_particle_set[particle_ID].m_age);
     }
 }
 

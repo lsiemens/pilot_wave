@@ -13,12 +13,13 @@ public:
     GLuint m_colorbuffer;
     GLsizei m_vertexBufferSize;
     GLuint m_matrixID;
+    GLuint m_ageID;
 
     Model(GLuint shaderID);
     void releaseBuffers();
     void setVertexBuffer(GLfloat data[], GLsizei bufferSize);
     void setColorBuffer(GLfloat data[], GLsizei bufferSize);
-    void drawModel(glm::mat4 modelSpaceToWorldSpace);
+    void drawModel(glm::mat4 modelSpaceToWorldSpace, float age=-1.f);
 };
 
 #endif
