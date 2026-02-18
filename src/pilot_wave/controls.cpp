@@ -1,64 +1,72 @@
 #include "controls.h"
 
-Controls::Controls(GLFWwindow* window, std::shared_ptr<Camera> camera_sptr, std::shared_ptr<QParticles> qparticles_sptr) {
+Controls::Controls(GLFWwindow* window, std::shared_ptr<Camera> camera_sptr,
+                   std::shared_ptr<QParticles> qparticles_sptr) : m_window(window) {
     assert(camera_sptr);
     assert(qparticles_sptr);
     m_camera_sptr = camera_sptr;
     m_qparticles_sptr = qparticles_sptr;
     m_loopLog = LoopLog::getInstance();
 
+    // Input settings
+    glfwSetInputMode(m_window, GLFW_STICKY_KEYS, GL_TRUE);
+    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
     // register callbacks
-    glfwSetWindowUserPointer(window, this);
-    glfwSetKeyCallback(window, key_callback);
-    glfwSetCharCallback(window, char_callback);
-    glfwSetCursorPosCallback(window, cursor_pos_callback);
+    glfwSetWindowUserPointer(m_window, this);
+    glfwSetMouseButtonCallback(m_window, mouse_button_callback);
+    glfwSetKeyCallback(m_window, key_callback);
+    glfwSetCharCallback(m_window, char_callback);
+    glfwSetCursorPosCallback(m_window, cursor_pos_callback);
 }
 
 void Controls::update(double dt) {
-    double horizontalAngle = 3.13, verticalAngle = 0.0;
-    float speed = 3.f, mouseSensitivity = 0.001f;
+    if (m_mouse_button_held[GLFW_MOUSE_BUTTON_LEFT]) {
+        m_view_angle += m_mouseSensitivity*(m_cursor_pos - m_cursor_pos_previous);
+    }
 
-    horizontalAngle = -mouseSensitivity*m_cursor_pos.x;
-    verticalAngle = mouseSensitivity*m_cursor_pos.y;
+    glm::dvec3 direction = glm::vec3(std::cos(m_view_angle.y)*std::sin(m_view_angle.x),
+                                    std::sin(m_view_angle.y),
+                                    std::cos(m_view_angle.y)*std::cos(m_view_angle.x));
 
-    glm::vec3 direction = glm::vec3(std::cos(verticalAngle)*std::sin(horizontalAngle),
-                     std::sin(verticalAngle),
-                     std::cos(verticalAngle)*std::cos(horizontalAngle));
+    glm::dvec3 right = glm::vec3(std::sin(m_view_angle.x - 3.14/2.),
+                                0.,
+                                std::cos(m_view_angle.x - 3.14/2.));
 
-    glm::vec3 right = glm::vec3(std::sin(horizontalAngle - 3.14f/2.f),
-                     0.f,
-                     std::cos(horizontalAngle - 3.14/2.f));
-
-    glm::vec3 up = glm::cross(right, direction);
-    glm::vec3 delta_position = glm::vec3(0.f, 0.f, 0.f);
+    glm::dvec3 up = glm::cross(right, direction);
+    glm::dvec3 delta_position = glm::vec3(0., 0., 0.);
 
     if (m_key_held[GLFW_KEY_W]) {
-        delta_position = static_cast<float>(dt)*direction*speed;
+        delta_position += direction;
     }
 
     if (m_key_held[GLFW_KEY_S]) {
-        delta_position = -static_cast<float>(dt)*direction*speed;
+        delta_position += -direction;
     }
 
     if (m_key_held[GLFW_KEY_D]) {
-        delta_position = static_cast<float>(dt)*right*speed;
+        delta_position += right;
     }
 
     if (m_key_held[GLFW_KEY_A]) {
-        delta_position = -static_cast<float>(dt)*right*speed;
+        delta_position += -right;
     }
 
     if (m_key_held[GLFW_KEY_R]) {
-        delta_position = static_cast<float>(dt)*up*speed;
+        delta_position += up;
     }
 
     if (m_key_held[GLFW_KEY_F]) {
-        delta_position = -static_cast<float>(dt)*up*speed;
+        delta_position += -up;
+    }
+
+    if (glm::length(delta_position) > 0.) {
+        delta_position = glm::normalize(delta_position);
     }
 
     m_camera_sptr->m_direction = direction;
     m_camera_sptr->m_up = up;
-    m_camera_sptr->m_position += delta_position;
+    m_camera_sptr->m_position += dt*m_speed*delta_position;
 
     // Ingest key press, it will be reset after this point
     if (m_key_pressed[GLFW_KEY_E]) {
@@ -84,10 +92,40 @@ void Controls::update(double dt) {
         m_loopLog->m_log << "Controls mode [Text | Keys]: [Keys]\n";
         m_loopLog->m_log << "\tText: [" << m_text << "]\n";
     }
+    m_loopLog->m_log << "Mouse input [left | middle | right]: [" << m_mouse_button_held[GLFW_MOUSE_BUTTON_LEFT] << " | " << m_mouse_button_held[GLFW_MOUSE_BUTTON_MIDDLE] << " | " << m_mouse_button_held[GLFW_MOUSE_BUTTON_RIGHT] << "]\n";
+
+    // This should remain at the end of update
+    m_cursor_pos_previous = m_cursor_pos;
 }
 
 void Controls::command(std::string) {
     //Process command
+}
+
+void Controls::mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    Controls* controls_ptr = static_cast<Controls*>(glfwGetWindowUserPointer(window));
+
+    if ((button >= 0) and (button < GLFW_MOUSE_BUTTON_LAST + 1)) {
+        if (action == GLFW_PRESS) {
+            controls_ptr->m_mouse_button_held[button] = true;
+        }
+
+        if (action == GLFW_RELEASE) {
+            controls_ptr->m_mouse_button_held[button] = false;
+        }
+    }
+
+    // capture mouse on left click
+    if (button == GLFW_MOUSE_BUTTON_LEFT) {
+        if (action == GLFW_PRESS) {
+            controls_ptr->m_pressed_left_button = true;
+            glfwSetInputMode(controls_ptr->m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        }
+
+        if (action == GLFW_RELEASE) {
+            glfwSetInputMode(controls_ptr->m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        }
+    }
 }
 
 void Controls::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -104,7 +142,7 @@ void Controls::key_callback(GLFWwindow* window, int key, int scancode, int actio
         }
     }
 
-    if ((key > 0) and (key < GLFW_KEY_LAST + 1)) {
+    if ((key >= 0) and (key < GLFW_KEY_LAST + 1)) {
         if (action == GLFW_PRESS) {
             // only limit pressing and not release in text mode to keys do not
             // get stuck
@@ -145,4 +183,9 @@ void Controls::cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 
     controls_ptr->m_cursor_pos.x = xpos;
     controls_ptr->m_cursor_pos.y = ypos;
+
+    if (controls_ptr->m_pressed_left_button) {
+        controls_ptr->m_pressed_left_button = false;
+        controls_ptr->m_cursor_pos_previous = controls_ptr->m_cursor_pos;
+    }
 }
