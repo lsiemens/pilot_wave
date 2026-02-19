@@ -48,7 +48,21 @@ double HarmonicOscillator::psi_n(glm::dvec3 position, std::size_t energy_level) 
 }
 
 glm::dvec3 HarmonicOscillator::grad_psi_n(glm::dvec3 position, std::size_t energy_level) const {
-    return glm::dvec3(0., 0., 0.);
+    QuantumNumbers quanum_numbers = m_energy_levels_QN[energy_level];
+
+    double grad_x =( dpsi_n_1D_dx(quanum_numbers.m_n_x, position.x)
+                    * psi_n_1D(quanum_numbers.m_n_y, position.y)
+                    * psi_n_1D(quanum_numbers.m_n_z, position.z));
+
+    double grad_y =(  psi_n_1D(quanum_numbers.m_n_x, position.x)
+                    *dpsi_n_1D_dx(quanum_numbers.m_n_y, position.y)
+                    * psi_n_1D(quanum_numbers.m_n_z, position.z));
+
+    double grad_z =(  psi_n_1D(quanum_numbers.m_n_x, position.x)
+                    * psi_n_1D(quanum_numbers.m_n_y, position.y)
+                    *dpsi_n_1D_dx(quanum_numbers.m_n_z, position.z));
+
+    return glm::dvec3(grad_x, grad_y, grad_z);
 }
 
 void HarmonicOscillator::find_energy_levels() {
@@ -133,9 +147,19 @@ double HarmonicOscillator::hermite_n(std::size_t n, double x) const {
 
 double HarmonicOscillator::psi_n_1D(std::size_t n, double x) const {
     constexpr double log2 = std::log(2);
-    constexpr double logPI = std::log(3.14);
+    constexpr double logPI = std::log(PI_D);
     double ln_prefactor = 0.25*(m_log_omega - logPI) - 0.5*(n*log2 + m_cumsum_ln_n[n]);
     double exponent = ln_prefactor - (m_m_e*m_omega*x*x/(2.*m_hbar));
     return std::exp(exponent)*hermite_n(n, m_sqrt_m_omega_hbar*x);
+}
+
+double HarmonicOscillator::dpsi_n_1D_dx(std::size_t n, double x) const {
+    constexpr double log2 = std::log(2);
+    constexpr double logPI = std::log(PI_D);
+    double ln_prefactor = 0.25*(m_log_omega - logPI) - 0.5*(n*log2 + m_cumsum_ln_n[n]);
+    double exponent = ln_prefactor - (m_m_e*m_omega*x*x/(2.*m_hbar));
+    double polynomial = ((m_m_e*m_omega/m_hbar)*x*hermite_n(n, m_sqrt_m_omega_hbar*x)
+                         -m_sqrt_m_omega_hbar*hermite_n(n + 1, m_sqrt_m_omega_hbar*x));
+    return std::exp(exponent)*polynomial;
 }
 

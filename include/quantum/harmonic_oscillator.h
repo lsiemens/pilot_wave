@@ -37,6 +37,7 @@ public:
     double factorial(std::size_t n) const;
     double hermite_n(std::size_t n, double x) const;
     double psi_n_1D(std::size_t n, double x) const;
+    double dpsi_n_1D_dx(std::size_t n, double x) const;
 
 private:
     std::vector<QuantumNumbers> m_energy_levels_QN;    

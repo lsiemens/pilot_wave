@@ -96,12 +96,41 @@ bool test_psi_1D(double omega) {
         double x = dx*static_cast<double>(i)-0.5*width;
 
         std::string name = "HarmonicOscillator.psi_1D(0, " + std::to_string(x) + ")";
-        if (not is_close(ho.psi_n_1D(0, x), psi_0_1D(x, omega), name, 1e-5, 1e-4)) {
+        if (not is_close(ho.psi_n_1D(0, x), psi_0_1D(x, omega), name)) {
             return false;
         }
 
         name = "HarmonicOscillator.psi_1D(4, " + std::to_string(x) + ")";
-        if (not is_close(ho.psi_n_1D(4, x), psi_4_1D(x, omega), name, 1e-5, 1e-4)) {
+        if (not is_close(ho.psi_n_1D(4, x), psi_4_1D(x, omega), name)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+/// Test HarmonicOscillator.dpsi_n_1D_dx against the derivative of the 0th and 4th state.
+bool test_dpsi_1D_dx(double omega) {
+    HarmonicOscillator ho(omega);
+    std::size_t N_max = 4;
+    ho.set_energy_level((N_max + 1)*(N_max + 2)*(N_max + 3)/6);
+
+    double width = 6/std::sqrt(2*omega);
+    std::size_t resolution = 100;
+    double dx = width/static_cast<double>(resolution);
+    double delta_x = 1e-5; // offset used in the central difference method
+    for (std::size_t i = 0; i <= resolution; i++) {
+        double x = dx*static_cast<double>(i)-0.5*width;
+
+        std::string name = "HarmonicOscillator.dpsi_1D_dx(0, " + std::to_string(x) + ")";
+        double dpsi_1D_dx = (psi_0_1D(x + delta_x, omega) - psi_0_1D(x - delta_x, omega))/(2*delta_x);
+        if (not is_close(ho.dpsi_n_1D_dx(0, x), dpsi_1D_dx, name)) {
+            return false;
+        }
+
+        name = "HarmonicOscillator.dpsi_1D_dx(4, " + std::to_string(x) + ")";
+        dpsi_1D_dx = (psi_4_1D(x + delta_x, omega) - psi_4_1D(x - delta_x, omega))/(2*delta_x);
+        if (not is_close(ho.dpsi_n_1D_dx(4, x), dpsi_1D_dx, name)) {
             return false;
         }
     }
@@ -130,8 +159,18 @@ int main() {
         return 1;
     }
 
-    if (not test_psi_1D(1/3.)) {
-        std::cerr << "\ttest_psi_1D(1/3) failed." << std::endl;
+    if (not test_psi_1D(3.0)) {
+        std::cerr << "\ttest_psi_1D(3.0) failed." << std::endl;
+        return 1;
+    }
+
+    if (not test_dpsi_1D_dx(1.0)) {
+        std::cerr << "\ttest_dpsi_1D_dx(1.0) failed." << std::endl;
+        return 1;
+    }
+
+    if (not test_dpsi_1D_dx(3.0)) {
+        std::cerr << "\ttest_dpsi_1D_dx(3.0) failed." << std::endl;
         return 1;
     }
 
