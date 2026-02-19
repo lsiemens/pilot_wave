@@ -28,12 +28,11 @@ public:
     double psi_n(glm::dvec3 position, std::size_t energy_level) const override;
     glm::dvec3 grad_psi_n(glm::dvec3 position, std::size_t energy_level) const override;
     void find_energy_levels() override;
+    double energy_eigenvalue(QuantumNumbers quantum_numbers) const;
 
 private:
     std::vector<QuantumNumbers> energy_levels_QN;    
     double m_norm;
-
-    double energy_eigenvalue(QuantumNumbers quantum_numbers) const;
 };
 
 #endif

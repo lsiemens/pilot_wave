@@ -21,6 +21,7 @@ inline bool is_close(T a, U b, std::string name="",
     V diff  = std::abs(a_v - b_v);
     if (not (diff <= (atol + rtol*diff))) {
         std::cerr << std::setprecision(10) << "Failed: " << name << " [ " << a << " ] != " << b << " is_close failed!" << std::endl;
+        std::cerr << "\tabs(ε) = [ " << diff << " ]" << std::endl;
         return false;
     }
 

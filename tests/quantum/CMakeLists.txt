@@ -1,9 +1,13 @@
-add_executable(square_well_test square_well_test.cpp)
+set(TESTS square_well_test harmonic_oscillator_test)
 
-target_link_libraries(square_well_test PRIVATE
-    glm::glm
-    quantum
-    testing
-    pilot_wave_warnings)
+foreach (test_name IN LISTS TESTS)
+    add_executable(${test_name} ${test_name}.cpp)
 
-add_test(NAME square_well_test COMMAND square_well_test)
+    target_link_libraries(${test_name} PRIVATE
+        glm::glm
+        quantum
+        testing
+        pilot_wave_warnings)
+
+    add_test(NAME ${test_name} COMMAND ${test_name})
+endforeach()

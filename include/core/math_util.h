@@ -1,20 +1,9 @@
-#ifndef PHYSICS_UTIL_H
-#define PHYSICS_UTIL_H
+#ifndef MATH_UTIL_H
+#define MATH_UTIL_H
 
-#include <functional>
 #include <numbers>
 
-#include <glm/glm.hpp>
-
-/// Vector field type
-/// Defines a vector filed as a std::function.
-/// @param position The position of a point.
-/// @param t_offset An offset from the current time in secconds.
-/// @returns The velocity at the point as a glm::vec3.
-using VectorField = std::function<glm::vec3(glm::vec3 position)>;
-using ScalarField = std::function<float(glm::vec3 position)>;
-
-#define PI_D std::numbers::pi
-#define PI_F static_cast<float>(std::numbers::pi)
+constexpr double PI_D = std::numbers::pi_v<double>;
+constexpr float PI_F = std::numbers::pi_v<float>;
 
 #endif
