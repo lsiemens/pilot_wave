@@ -6,18 +6,18 @@ project(pilot_wave
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-# setup OpenGL GLEW and GLFW
+# setup external packages
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
-find_package(glm REQUIRED)
+find_package(glm CONFIG REQUIRED)
+include(CTest)
 
 option(ENABLE_WARNINGS "Enable compiler warnings" ON)
 option(STRICT_WARNINGS "Enable strict compiler warnings" ON)
 option(ERROR_ON_WARNING "Treat warnings to errors" OFF)
-option(BUILD_DOC "Build documentation" ON)
+option(BUILD_DOC "Build documentation" OFF)
 
 add_library(pilot_wave_warnings INTERFACE)
 if(ENABLE_WARNINGS)
@@ -34,4 +34,7 @@ if(BUILD_DOC)
 endif()
 
 add_subdirectory(src)
-add_subdirectory(assets)
+
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()

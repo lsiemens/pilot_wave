@@ -7,7 +7,7 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "path_util.h"
+#include "core/path_util.h"
 
 GLuint CompileShader(const std::string& shader_file_path, GLenum shader_type){
     GLuint ShaderID = glCreateShader(shader_type);

@@ -1,5 +1,8 @@
-add_library(pilot_wave_quantum_obj OBJECT
+add_library(quantum STATIC)
+
+target_sources(quantum PRIVATE
     qstate.cpp square_well.cpp)
 
-target_include_directories(pilot_wave_quantum_obj PUBLIC ${PROJECT_SOURCE_DIR}/src)
-target_link_libraries(pilot_wave_quantum_obj PRIVATE pilot_wave_warnings)
+target_include_directories(quantum PUBLIC "${CMAKE_SOURCE_DIR}/include")
+target_link_libraries(quantum PUBLIC core
+                              PRIVATE pilot_wave_warnings)

@@ -1,4 +1,4 @@
-#include "controls.h"
+#include "pilot_wave/controls.h"
 
 Controls::Controls(GLFWwindow* window, std::shared_ptr<Camera> camera_sptr,
                    std::shared_ptr<QParticles> qparticles_sptr) : m_window(window) {
