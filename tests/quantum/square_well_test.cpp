@@ -46,43 +46,35 @@ bool test_wave_function(std::size_t n_max, std::size_t resolution=10) {
     }
 
     for (std::size_t n = 1; n < n_max; n++) {
-        for (std::size_t m = 0; m < n; m++) {
-            
-        double dx = width/static_cast<double>(resolution);
-        double dv = dx*dx*dx;
-        double integral = 0;
-        for (std::size_t i1 = 0; i1 < resolution; i1++) {
-            double x1 = dx*(static_cast<double>(i1) + 0.5);
-            for (std::size_t j1 = 0; j1 < resolution; j1++) {
-                double y1 = dx*(static_cast<double>(j1) + 0.5);
-                for (std::size_t k1 = 0; k1 < resolution; k1++) {
-                    double z1 = dx*(static_cast<double>(k1) + 0.5);
-                    glm::dvec3 x_vec(x1, y1, z1);
+        for (std::size_t m = 0; m <= n; m++) {
+                
+            double dx = width/static_cast<double>(resolution);
+            double dv = dx*dx*dx;
+            double integral = 0;
+            for (std::size_t i1 = 0; i1 < resolution; i1++) {
+                double x1 = dx*(static_cast<double>(i1) + 0.5);
+                for (std::size_t j1 = 0; j1 < resolution; j1++) {
+                    double y1 = dx*(static_cast<double>(j1) + 0.5);
+                    for (std::size_t k1 = 0; k1 < resolution; k1++) {
+                        double z1 = dx*(static_cast<double>(k1) + 0.5);
+                        glm::dvec3 x_vec(x1, y1, z1);
 
-
-                    for (std::size_t i2 = 0; i2 < resolution; i2++) {
-                        double x2 = dx*(static_cast<double>(i2) + 0.5);
-                        for (std::size_t j2 = 0; j2 < resolution; j2++) {
-                            double y2 = dx*(static_cast<double>(j2) + 0.5);
-                            for (std::size_t k2 = 0; k2 < resolution; k2++) {
-                                double z2 = dx*(static_cast<double>(k2) + 0.5);
-                                glm::dvec3 y_vec(x2, y2, z2);
-
-                                integral += dv*dv*sw.psi_n(x_vec, n)
-                                                 *sw.psi_n(y_vec, m);
-                                }
-                            }
-                        }
-
+                        integral += dv*sw.psi_n(x_vec, n)*sw.psi_n(x_vec, m);
                     }
                 }
             }
 
             std::string name = "Integral of |psi_" + std::to_string(n) + "(x)"
-                                           "*psi_" + std::to_string(m) + "(y)|^2";
-            if (not is_close(integral, 0., name)) {
-                return false;
-            } 
+                                           "*psi_" + std::to_string(m) + "(x)|^2";
+            if (n == m) {
+                if (not is_close(integral, 1., name)) {
+                    return false;
+                } 
+            } else {
+                if (not is_close(integral, 0., name)) {
+                    return false;
+                } 
+            }
         }
     }
     return true;
