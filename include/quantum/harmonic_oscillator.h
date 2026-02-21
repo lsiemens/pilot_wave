@@ -31,6 +31,7 @@ public:
     double psi_0_max() const override;
     double psi_n(glm::dvec3 position, std::size_t energy_level) const override;
     glm::dvec3 grad_psi_n(glm::dvec3 position, std::size_t energy_level) const override;
+    std::string get_state_string() const override;
     void find_energy_levels() override;
 
     double energy_eigenvalue(QuantumNumbers quantum_numbers) const;

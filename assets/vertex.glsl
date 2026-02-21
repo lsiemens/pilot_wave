@@ -9,7 +9,6 @@ uniform mat4 ModelTransform;
 uniform float Age;
 
 float Age_Scale = 1.f;
-const float PI = 3.141592;
 
 out vec3 fragmentColor;
 out float view_distance;
@@ -26,8 +25,8 @@ void main() {
     if (Age < 0) {
         fragmentColor = vertexColor;
     } else {
-        float arg = (1 - exp(-0.2*Age));
-        float t2 = (1 - exp(-Age));
+        float arg = (1 - exp(-0.2*Age/Age_Scale));
+        float t2 = (1 - exp(-Age/Age_Scale));
 
         fragmentColor = pow(t2*palette(arg), vec3(0.85f));
     }

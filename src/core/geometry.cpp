@@ -6,7 +6,7 @@
 
 #include <glm/glm.hpp>
 
-constexpr double pi = 3.14159265358979323846;
+#include "core/math_util.h"
 
 /// Get the 2d coordinate of the nth vertex in the triangulation of a grid
 glm::vec2 meshgrid(int x_res, int y_res, int vertex_index) {
@@ -126,8 +126,8 @@ Model make_tetrahedron(float size, GLuint shaderID) {
 glm::vec3 sphere_map(float radius, glm::vec2 uv_position) {
     glm::vec3 position;
 
-    float theta = 2*static_cast<float>(pi)*uv_position.x;
-    float phi = static_cast<float>(pi)*uv_position.y;
+    float theta = 2*PI_F*uv_position.x;
+    float phi = PI_F*uv_position.y;
 
     position.x = radius*std::sin(phi)*std::cos(theta);
     position.y = radius*std::sin(phi)*std::sin(theta);
@@ -140,8 +140,8 @@ glm::vec3 sphere_map(float radius, glm::vec2 uv_position) {
 glm::vec3 torus_map(float minor_radius, float major_radius, glm::vec2 uv_position) {
     glm::vec3 position;
 
-    float theta = 2*static_cast<float>(pi)*uv_position.x;
-    float phi = 2*static_cast<float>(pi)*uv_position.y;
+    float theta = 2*PI_F*uv_position.x;
+    float phi = 2*PI_F*uv_position.y;
 
     position.x = (major_radius + minor_radius*std::cos(theta))*std::cos(phi);
     position.y = (major_radius + minor_radius*std::cos(theta))*std::sin(phi);

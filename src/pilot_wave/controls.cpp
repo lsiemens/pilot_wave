@@ -1,5 +1,7 @@
 #include "pilot_wave/controls.h"
 
+#include "core/math_util.h"
+
 Controls::Controls(GLFWwindow* window, std::shared_ptr<Camera> camera_sptr,
                    std::shared_ptr<QParticles> qparticles_sptr) : m_window(window) {
     assert(camera_sptr);
@@ -29,12 +31,12 @@ void Controls::update(double dt) {
                                     std::sin(m_view_angle.y),
                                     std::cos(m_view_angle.y)*std::cos(m_view_angle.x));
 
-    glm::dvec3 right = glm::vec3(std::sin(m_view_angle.x - 3.14/2.),
+    glm::dvec3 right = glm::vec3(std::sin(m_view_angle.x - PI_F/2.f),
                                 0.,
-                                std::cos(m_view_angle.x - 3.14/2.));
+                                std::cos(m_view_angle.x - PI_F/2.f));
 
     glm::dvec3 up = glm::cross(right, direction);
-    glm::dvec3 delta_position = glm::vec3(0., 0., 0.);
+    glm::dvec3 delta_position = glm::vec3(0.f, 0.f, 0.f);
 
     if (m_key_held[GLFW_KEY_W]) {
         delta_position += direction;
@@ -92,14 +94,12 @@ void Controls::update(double dt) {
         m_loopLog->m_log << "Controls mode [Text | Keys]: [Keys]\n";
         m_loopLog->m_log << "\tText: [" << m_text << "]\n";
     }
-    m_loopLog->m_log << "Mouse input [left | middle | right]: [" << m_mouse_button_held[GLFW_MOUSE_BUTTON_LEFT] << " | " << m_mouse_button_held[GLFW_MOUSE_BUTTON_MIDDLE] << " | " << m_mouse_button_held[GLFW_MOUSE_BUTTON_RIGHT] << "]\n";
 
     // This should remain at the end of update
     m_cursor_pos_previous = m_cursor_pos;
 }
 
-void Controls::command(std::string) {
-    //Process command
+void Controls::command(std::string command_str) {
 }
 
 void Controls::mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {

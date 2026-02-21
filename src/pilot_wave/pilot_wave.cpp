@@ -17,6 +17,7 @@
 #include "core/path_util.h"
 #include "core/geometry.h"
 
+#include "quantum/harmonic_oscillator.h"
 #include "quantum/square_well.h"
 #include "pilot_wave/qparticles.h"
 #include "pilot_wave/controls.h"
@@ -68,7 +69,7 @@ int main() {
     Object torus = Object(make_torus(0.5f, 1.f, 100, 100, shaderID));
     torus.m_position = glm::vec3(-3.0f, 0.0f, -3.0f);
 
-    auto qstate_uptr = std::make_unique<SquareWell>(2.);
+    auto qstate_uptr = std::make_unique<HarmonicOscillator>(2.);
     std::shared_ptr<QParticles> qparticles_sptr = std::make_shared<QParticles>(std::move(qstate_uptr), shaderID);
     qparticles_sptr->m_qstate_uptr->set_energy_level(1);
 

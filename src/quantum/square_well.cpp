@@ -33,6 +33,21 @@ SquareWell::SquareWell(double width) {
     find_energy_levels();
 }
 
+std::string SquareWell::get_state_string() const {
+    if (get_num_states() > 0) {
+        return "No state representation";
+    } else {
+        std::size_t energy_level = get_energy_level();
+        QuantumNumbers quantum_numbers = energy_levels_QN[energy_level];
+        std::string str_repr = "Energy level [" + std::to_string(energy_level) + "] ";
+        str_repr += "quantum numbers: ";
+        str_repr += "(" + std::to_string(quantum_numbers.m_n_x) + ","
+                        + std::to_string(quantum_numbers.m_n_y) + ","
+                        + std::to_string(quantum_numbers.m_n_z) + ")";
+        return str_repr;
+    }
+}
+
 double SquareWell::psi_0_max() const {
     return m_norm;
 }
@@ -100,7 +115,7 @@ void SquareWell::find_energy_levels() {
     //std::cout << "Find energy levels: # states " << n_states << std::endl;
 
     // TODO improve and clarify this huristic
-    std::size_t n_max = static_cast<std::size_t>(std::sqrt(3.) + std::ceil(std::pow(6.*static_cast<double>(n_states)/3.14, 1/3.)));
+    std::size_t n_max = static_cast<std::size_t>(std::sqrt(3.) + std::ceil(std::pow(6.*static_cast<double>(n_states)/PI_D, 1/3.)));
     std::vector<QuantumNumbers> initial_set(n_max*n_max*n_max);
 
     for (std::size_t i = 0; i < n_max; i++) {

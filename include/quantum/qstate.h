@@ -42,6 +42,7 @@
 #define QSTATE_H
 
 #include <vector>
+#include <string>
 #include <complex>
 
 #include <glm/glm.hpp>
@@ -143,6 +144,9 @@ public:
     /// Find energy levels and the set of quantum numbers ordered by their
     /// energy. This is used to access energy eigenstates by their index.
     virtual void find_energy_levels() = 0;
+
+    /// Get a representation of the quantum states.
+    virtual std::string get_state_string() const = 0;
 
     // --- Getters ---
 

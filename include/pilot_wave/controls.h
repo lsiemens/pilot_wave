@@ -24,7 +24,7 @@ public:
     Controls(GLFWwindow* window, std::shared_ptr<Camera> camera_sprt, std::shared_ptr<QParticles> qparticles_sptr);
 
     void update(double dt);
-    void command(std::string);
+    void command(std::string command_str);
 
 private:
     static void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos);

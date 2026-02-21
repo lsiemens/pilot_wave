@@ -38,6 +38,7 @@ void QParticles::update(double dt) {
     }
     m_loopLog->m_log << "QParticles | dt*spawn_rate: [" << lambda << "]\n";
     m_loopLog->m_log << "QParticles | new particles: [" << num_new_particles << "]\n";
+    m_loopLog->m_log << m_qstate_uptr->get_state_string() << "\n";
 
     m_qstate_uptr->update(dt);
     m_particles_uptr->update(dt);
