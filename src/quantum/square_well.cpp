@@ -133,6 +133,11 @@ void SquareWell::find_energy_levels() {
 
     energy_levels_QN.resize(n_states);
     std::copy_n(initial_set.begin(), n_states, energy_levels_QN.begin());
+
+    m_energy_eigenvalues.resize(n_states);
+    for (std::size_t i = 0; i < n_states; i++) {
+        m_energy_eigenvalues[i] = energy_eigenvalue(energy_levels_QN[i]);
+    }
 }
 
 double SquareWell::energy_eigenvalue(QuantumNumbers quantum_numbers) const {

@@ -118,11 +118,17 @@ void HarmonicOscillator::find_energy_levels() {
     m_energy_levels_QN.resize(n_states);
     std::copy_n(initial_set.begin(), n_states, m_energy_levels_QN.begin());
 
+    m_energy_eigenvalues.resize(n_states);
+    for (std::size_t i = 0; i < n_states; i++) {
+        m_energy_eigenvalues[i] = energy_eigenvalue(m_energy_levels_QN[i]);
+    }
+
     m_cumsum_ln_n.resize(N_max + 1);
     m_cumsum_ln_n[0] = 0.;
     for (std::size_t n = 1; n < N_max; n++) {
         m_cumsum_ln_n[n] = std::log(n) + m_cumsum_ln_n[n - 1];
     }
+    
     m_N_max = N_max;
 }
 

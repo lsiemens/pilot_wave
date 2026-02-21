@@ -191,16 +191,16 @@ protected:
     /// domain center
     glm::dvec3 m_origin = glm::dvec3(0., 0., 0.);
 
+    /// The systems energy levels.
+    /// An ordered list of energy levels for use in the time dependent component
+    /// of the wavefunction. The energy is given in units of \f$[E_h]\f$.
+    std::vector<double> m_energy_eigenvalues = {};
+
 private:
     /// Elapsed time.
     /// The time used in the time dependent component of the wavefunction. The
     /// time is given in units of \f$[\hbar / E_h]\f$.
     double m_time = 0.;
-
-    /// The systems energy levels.
-    /// An ordered list of energy levels for use in the time dependent component
-    /// of the wavefunction. The energy is given in units of \f$[E_h]\f$.
-    std::vector<double> m_energy_eigenvalues = {};
 
     /// The initial state coefficients.
     /// A list of the initial complex coefficients ordered by the energy level.

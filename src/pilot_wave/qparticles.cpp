@@ -43,14 +43,12 @@ void QParticles::update(double dt) {
     m_qstate_uptr->update(dt);
     m_particles_uptr->update(dt);
 
-    float dt_f = static_cast<float>(dt);
-
     for (std::size_t i = m_particles_uptr->m_live_IDs.size(); i-- > 0; ) {
         Particle& particle = m_particles_uptr->m_particle_set[m_particles_uptr->m_live_IDs[i]];
-        particle.m_position += dt_f*glm::vec3(0.f, 0.f, 0.f);
 
         double rho = m_qstate_uptr->probability_density(particle.m_position);
         glm::dvec3 v_rho = m_qstate_uptr->probability_current(particle.m_position);
+        particle.m_position += dt*v_rho/rho;
 
         particle.m_decay_rate = m_particles_uptr->decay_rate(m_max_lifetime, rho, m_rho_0_max);
     }

@@ -2,7 +2,7 @@
 
 void QState::set_coefficients(const std::vector<std::complex<double>>& coefficients) {
     m_coeff = coefficients;
-    find_energy_levels();
+    m_coeff_t = coefficients;
     m_num_states = m_coeff.size();
     m_energy_level = 0;
 
