@@ -2,7 +2,9 @@
 
 #include "core/math_util.h"
 #include "quantum/harmonic_oscillator.h"
+
 #include "testing/testing.h"
+#include "testing/integrate.h"
 
 bool test_constants() {
     HarmonicOscillator ho(1.0);
@@ -138,6 +140,69 @@ bool test_dpsi_1D_dx(double omega) {
     return true;
 }
 
+bool test_orthonorm_1D(double omega) {
+    HarmonicOscillator ho(omega);
+    std::size_t N_max = 10;
+    ho.set_energy_level((N_max + 1)*(N_max + 2)*(N_max + 3)/6);
+    double x_max = 10.;
+
+    std::size_t resolution = 100;
+    for (std::size_t n = 0; n < N_max; n++) {
+        for (std::size_t m = 0; m <= n; m++) {
+
+            auto integrand_1D = [&ho, n, m](double x) {
+                return ho.psi_n_1D(n, x)*ho.psi_n_1D(m, x);
+            };
+
+            auto value = integrate_uniform_1D(-x_max, x_max, resolution, integrand_1D);
+
+            std::string name = "integral1D(-10, 10) |psi_1D(" + std::to_string(n) + ", x)psi_1D(" + std::to_string(m) + ", x)|^2";
+            if (n == m) {
+                if (not is_close(value, 1., name)) {
+                    return false;
+                }
+            } else {
+                if (not is_close(value, 0., name)) {
+                    return false;
+                }
+            }
+            std::cerr << "Passed: (" << n << "," << m << ")" << std::endl;
+        }
+    }
+    return true;
+}
+
+bool test_orthonorm_3D(double omega) {
+    HarmonicOscillator ho(omega);
+    std::size_t N_max = 10;
+    ho.set_energy_level((N_max + 1)*(N_max + 2)*(N_max + 3)/6);
+    double x_max = 10.;
+
+    std::size_t resolution = 100;
+    for (std::size_t n = 0; n < N_max; n++) {
+        for (std::size_t m = 0; m <= n; m++) {
+
+            auto integrand_3D = [&ho, n, m](glm::dvec3 x) {
+                return ho.psi_n(x, n)*ho.psi_n(x, m);
+            };
+
+            auto value = integrate_uniform_3D(-x_max, x_max, resolution, integrand_3D);
+
+            std::string name = "integral(-10, 10) |psi_3D(" + std::to_string(n) + ", x)psi_3D(" + std::to_string(m) + ", x)|^2";
+            if (n == m) {
+                if (not is_close(value, 1., name)) {
+                    return false;
+                }
+            } else {
+                if (not is_close(value, 0., name)) {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
 int main() {
     if (not test_constants()) {
         std::cerr << "\ttest_constants() failed." << std::endl;
@@ -171,6 +236,21 @@ int main() {
 
     if (not test_dpsi_1D_dx(3.0)) {
         std::cerr << "\ttest_dpsi_1D_dx(3.0) failed." << std::endl;
+        return 1;
+    }
+
+    if (not test_orthonorm_1D(1.0)) {
+        std::cerr << "\ttest_orthonorm_1D(1.0) failed." << std::endl;
+        return 1;
+    }
+
+    if (not test_orthonorm_3D(1.0)) {
+        std::cerr << "\ttest_orthonorm_3D(1.0) failed." << std::endl;
+        return 1;
+    }
+
+    if (not test_orthonorm_3D(3.0)) {
+        std::cerr << "\ttest_orthonorm_3D(3.0) failed." << std::endl;
         return 1;
     }
 

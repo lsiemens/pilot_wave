@@ -1,7 +1,9 @@
 #include <iostream>
 
 #include "quantum/square_well.h"
+
 #include "testing/testing.h"
+#include "testing/integrate.h"
 
 bool test_constants() {
     SquareWell sw(1.0);
@@ -18,62 +20,31 @@ bool test_constants() {
     return true;
 }
 
-bool test_wave_function(std::size_t n_max, std::size_t resolution=10) {
-    double width = 1.0;
+bool test_orthonorm_3D(double omega) {
+    SquareWell sq(omega);
+    std::size_t N_max = 10;
+    sq.set_energy_level(N_max);
+    double x_max = 10.;
 
-    SquareWell sw(width);
-    sw.set_energy_level(n_max);
-
-    for (std::size_t n = 0; n < n_max; n++) {
-        double dx = width/static_cast<double>(resolution);
-        double dv = dx*dx*dx;
-        double integral = 0;
-        for (std::size_t i = 0; i < resolution; i++) {
-            double x = dx*(static_cast<double>(i) + 0.5);
-            for (std::size_t j = 0; j < resolution; j++) {
-                double y = dx*(static_cast<double>(j) + 0.5);
-                for (std::size_t k = 0; k < resolution; k++) {
-                    double z = dx*(static_cast<double>(k) + 0.5);
-                    integral += dv*std::norm(sw.psi_n(glm::dvec3(x, y, z), n));
-                }
-            }
-        }
-
-        std::string name = "Integral of |psi_" + std::to_string(n) + "(x)|^2";
-        if (not is_close(integral, 1., name)) {
-            return false;
-        } 
-    }
-
-    for (std::size_t n = 1; n < n_max; n++) {
+    std::size_t resolution = 100;
+    for (std::size_t n = 0; n < N_max; n++) {
         for (std::size_t m = 0; m <= n; m++) {
-                
-            double dx = width/static_cast<double>(resolution);
-            double dv = dx*dx*dx;
-            double integral = 0;
-            for (std::size_t i1 = 0; i1 < resolution; i1++) {
-                double x1 = dx*(static_cast<double>(i1) + 0.5);
-                for (std::size_t j1 = 0; j1 < resolution; j1++) {
-                    double y1 = dx*(static_cast<double>(j1) + 0.5);
-                    for (std::size_t k1 = 0; k1 < resolution; k1++) {
-                        double z1 = dx*(static_cast<double>(k1) + 0.5);
-                        glm::dvec3 x_vec(x1, y1, z1);
 
-                        integral += dv*sw.psi_n(x_vec, n)*sw.psi_n(x_vec, m);
-                    }
-                }
-            }
+            auto integrand_3D = [&sq, n, m](glm::dvec3 x) {
+                return sq.psi_n(x, n)*sq.psi_n(x, m);
+            };
 
-            std::string name = "Integral of |psi_" + std::to_string(n) + "(x)"
-                                           "*psi_" + std::to_string(m) + "(x)|^2";
+            auto value = integrate_uniform_3D(-x_max, x_max, resolution, integrand_3D);
+
+            std::string name = "integral(-10, 10) |psi_3D(" + std::to_string(n) + ", x)psi_3D(" + std::to_string(m) + ", x)|^2";
             if (n == m) {
-                if (not is_close(integral, 1., name)) {
+                if (not is_close(value, 1., name)) {
                     return false;
-                } 
+                }
             } else {
-                if (not is_close(integral, 0., name)) {
+                if (not is_close(value, 0., name)) {
                     return false;
-                } 
+                }
             }
         }
     }
@@ -86,8 +57,8 @@ int main() {
         return 1;
     }
 
-    if (not test_wave_function(5)) {
-        std::cerr << "\ttest_wave_function(5) failed." << std::endl;
+    if (not test_orthonorm_3D(1.0)) {
+        std::cerr << "\ttest_orthonorm_3D(1.0) failed." << std::endl;
         return 1;
     }
 
