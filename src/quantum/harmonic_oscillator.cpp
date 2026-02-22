@@ -168,16 +168,18 @@ double HarmonicOscillator::hermite_n(std::size_t n, double x) const {
 }
 
 double HarmonicOscillator::psi_n_1D(std::size_t n, double x) const {
-    constexpr double log2 = std::log(2);
-    constexpr double logPI = std::log(PI_D);
+    static const double log2 = std::log(2);
+    static const double logPI = std::log(PI_D);
+
     double ln_prefactor = 0.25*(m_log_omega - logPI) - 0.5*(static_cast<double>(n)*log2 + m_cumsum_ln_n[n]);
     double exponent = ln_prefactor - (m_m_e*m_omega*x*x/(2.*m_hbar));
     return std::exp(exponent)*hermite_n(n, m_sqrt_m_omega_hbar*x);
 }
 
 double HarmonicOscillator::dpsi_n_1D_dx(std::size_t n, double x) const {
-    constexpr double log2 = std::log(2);
-    constexpr double logPI = std::log(PI_D);
+    static const double log2 = std::log(2);
+    static const double logPI = std::log(PI_D);
+
     double ln_prefactor = 0.25*(m_log_omega - logPI) - 0.5*(static_cast<double>(n)*log2 + m_cumsum_ln_n[n]);
     double exponent = ln_prefactor - (m_m_e*m_omega*x*x/(2.*m_hbar));
     double polynomial = ((m_m_e*m_omega/m_hbar)*x*hermite_n(n, m_sqrt_m_omega_hbar*x)
