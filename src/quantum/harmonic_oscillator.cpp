@@ -91,7 +91,7 @@ void HarmonicOscillator::find_energy_levels() {
 
     std::cout << "Find energy levels: # states " << n_states << std::endl;
 
-    std::size_t N_max = static_cast<std::size_t>(std::ceil(std::pow(6.*n_states, 1/3.) - 2.));
+    std::size_t N_max = static_cast<std::size_t>(std::ceil(std::pow(6.*static_cast<double>(n_states), 1/3.) - 2.));
 
     while ((N_max + 1)*(N_max + 2)*(N_max + 3)/6 < n_states) {
         N_max++;
@@ -99,12 +99,12 @@ void HarmonicOscillator::find_energy_levels() {
 
     std::vector<QuantumNumbers> initial_set((N_max + 1)*(N_max + 2)*(N_max + 3)/6);
 
-    std::size_t i = 0;
+    std::size_t index = 0;
     for (std::size_t n_z = 0; n_z <= N_max; n_z++) {
         for (std::size_t n_y = 0; n_y <= N_max - n_z; n_y++) {
             for (std::size_t n_x = 0; n_x <= N_max - n_z - n_y; n_x++) {
-                initial_set[i] = QuantumNumbers(n_x, n_y, n_z);
-                i++;
+                initial_set[index] = QuantumNumbers(n_x, n_y, n_z);
+                index++;
             }
         }
     }
@@ -161,7 +161,7 @@ double HarmonicOscillator::hermite_n(std::size_t n, double x) const {
         Hn_m2 = Hn_m1;
         Hn_m1 = Hn;
 
-        Hn = 2*(x*Hn_m1 - i*Hn_m2);
+        Hn = 2*(x*Hn_m1 - static_cast<double>(i)*Hn_m2);
     }
 
     return Hn;
@@ -170,7 +170,7 @@ double HarmonicOscillator::hermite_n(std::size_t n, double x) const {
 double HarmonicOscillator::psi_n_1D(std::size_t n, double x) const {
     constexpr double log2 = std::log(2);
     constexpr double logPI = std::log(PI_D);
-    double ln_prefactor = 0.25*(m_log_omega - logPI) - 0.5*(n*log2 + m_cumsum_ln_n[n]);
+    double ln_prefactor = 0.25*(m_log_omega - logPI) - 0.5*(static_cast<double>(n)*log2 + m_cumsum_ln_n[n]);
     double exponent = ln_prefactor - (m_m_e*m_omega*x*x/(2.*m_hbar));
     return std::exp(exponent)*hermite_n(n, m_sqrt_m_omega_hbar*x);
 }
@@ -178,7 +178,7 @@ double HarmonicOscillator::psi_n_1D(std::size_t n, double x) const {
 double HarmonicOscillator::dpsi_n_1D_dx(std::size_t n, double x) const {
     constexpr double log2 = std::log(2);
     constexpr double logPI = std::log(PI_D);
-    double ln_prefactor = 0.25*(m_log_omega - logPI) - 0.5*(n*log2 + m_cumsum_ln_n[n]);
+    double ln_prefactor = 0.25*(m_log_omega - logPI) - 0.5*(static_cast<double>(n)*log2 + m_cumsum_ln_n[n]);
     double exponent = ln_prefactor - (m_m_e*m_omega*x*x/(2.*m_hbar));
     double polynomial = ((m_m_e*m_omega/m_hbar)*x*hermite_n(n, m_sqrt_m_omega_hbar*x)
                          -m_sqrt_m_omega_hbar*hermite_n(n + 1, m_sqrt_m_omega_hbar*x));

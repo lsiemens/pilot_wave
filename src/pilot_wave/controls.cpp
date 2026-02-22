@@ -136,7 +136,7 @@ void Controls::command(std::string command_str) {
     }
 }
 
-void Controls::mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+void Controls::mouse_button_callback(GLFWwindow* window, int button, int action, int /*mods*/) {
     Controls* controls_ptr = static_cast<Controls*>(glfwGetWindowUserPointer(window));
 
     if ((button >= 0) and (button < GLFW_MOUSE_BUTTON_LAST + 1)) {
@@ -162,7 +162,7 @@ void Controls::mouse_button_callback(GLFWwindow* window, int button, int action,
     }
 }
 
-void Controls::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+void Controls::key_callback(GLFWwindow* window, int key, int /*scancode*/, int action, int /*mods*/) {
     Controls* controls_ptr = static_cast<Controls*>(glfwGetWindowUserPointer(window));
 
     // Set control mode

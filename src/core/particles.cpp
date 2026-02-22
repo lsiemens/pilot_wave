@@ -24,7 +24,7 @@ void Particles::drawParticles() {
 
         // draw particle given by particle_ID
         glm::mat4 translation = glm::translate(glm::mat4(1.f), m_particle_set[particle_ID].m_position);
-        this->m_model.drawModel(translation, m_particle_set[particle_ID].m_age);
+        this->m_model.drawModel(translation, static_cast<float>(m_particle_set[particle_ID].m_age));
     }
 }
 
