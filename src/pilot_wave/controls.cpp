@@ -1,5 +1,8 @@
 #include "pilot_wave/controls.h"
 
+#include <iostream>
+#include <iterator>
+#include <sstream>
 #include "core/math_util.h"
 
 Controls::Controls(GLFWwindow* window, std::shared_ptr<Camera> camera_sptr,
@@ -72,17 +75,20 @@ void Controls::update(double dt) {
 
     // Ingest key press, it will be reset after this point
     if (m_key_pressed[GLFW_KEY_E]) {
-        std::size_t energy_level = m_qparticles_sptr->m_qstate_uptr->get_energy_level();
-        m_qparticles_sptr->m_qstate_uptr->set_energy_level(energy_level + 1);
-
+        if (m_qparticles_sptr->m_qstate_uptr->get_num_states() == 0) {
+            std::size_t energy_level = m_qparticles_sptr->m_qstate_uptr->get_energy_level();
+            m_qparticles_sptr->m_qstate_uptr->set_energy_level(energy_level + 1);
+        }
         m_key_pressed[GLFW_KEY_E] = false;
     }
 
     // Ingest key press, it will be reset after this point
     if (m_key_pressed[GLFW_KEY_Q]) {
-        std::size_t energy_level = m_qparticles_sptr->m_qstate_uptr->get_energy_level();
-        if (energy_level > 0) {
-            m_qparticles_sptr->m_qstate_uptr->set_energy_level(energy_level - 1);
+        if (m_qparticles_sptr->m_qstate_uptr->get_num_states() == 0) {
+            std::size_t energy_level = m_qparticles_sptr->m_qstate_uptr->get_energy_level();
+            if (energy_level > 0) {
+                m_qparticles_sptr->m_qstate_uptr->set_energy_level(energy_level - 1);
+            }
         }
         m_key_pressed[GLFW_KEY_Q] = false;
     }
@@ -100,6 +106,34 @@ void Controls::update(double dt) {
 }
 
 void Controls::command(std::string command_str) {
+    if (command_str.starts_with("normalize")) {
+        m_qparticles_sptr->m_qstate_uptr->normalize();
+    }
+
+    if (command_str.starts_with("n:")) {
+        std::string prefix;
+        std::istringstream stream(command_str);
+        std::getline(stream, prefix, ':');
+
+        char skip;
+        int signed_n = 0;
+        double c_i=0, c_r=0;
+        stream >> signed_n >> skip >> c_r >> skip >> c_i;
+
+        std::size_t n = static_cast<std::size_t>(std::max(0, signed_n));
+
+        if ((c_r == 0) and (c_i == 0)) {
+            m_qparticles_sptr->m_qstate_uptr->set_energy_level(n);
+            return;
+        }
+
+        std::complex<double> coefficient(c_r, c_i);
+        m_qparticles_sptr->m_qstate_uptr->set_coefficient(n, coefficient);
+    }
+
+    if (command_str.starts_with("clear")) {
+        m_qparticles_sptr->m_qstate_uptr->set_coefficients({{0., 0.}});
+    }
 }
 
 void Controls::mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {

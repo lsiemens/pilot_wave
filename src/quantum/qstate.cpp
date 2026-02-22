@@ -5,8 +5,40 @@ void QState::set_coefficients(const std::vector<std::complex<double>>& coefficie
     m_coeff_t = coefficients;
     m_num_states = m_coeff.size();
     m_energy_level = 0;
+    m_time = 0.;
 
     find_energy_levels();
+    norm_update();
+}
+
+void QState::set_coefficient(std::size_t n, std::complex<double> coefficient) {
+    if (n >= m_num_states) {
+        m_coeff.resize(n + 1);
+        for (std::size_t i = m_num_states; i < n + 1; i++) {
+            m_coeff[i] = std::complex<double>(0., 0.);
+        }
+    }
+    m_coeff[n] = coefficient;
+
+    m_coeff_t = m_coeff;
+    m_num_states = m_coeff.size();
+    m_energy_level = 0;
+    m_time = 0.;
+
+    find_energy_levels();
+    norm_update();
+}
+
+void QState::normalize() {
+    norm_update();
+    double value = 1/std::sqrt(m_state_norm);
+    for (std::size_t i = 0; i < m_num_states; i++) {
+        m_coeff[i] = m_coeff[i]*value;
+    }
+
+    m_coeff_t = m_coeff;
+    m_time = 0.;
+    norm_update();
 }
 
 void QState::set_energy_level(std::size_t energy_level) {
@@ -14,6 +46,7 @@ void QState::set_energy_level(std::size_t energy_level) {
     m_num_states = 0;
 
     find_energy_levels();
+    norm_update();
 }
 
 void QState::update(double dt) {

@@ -72,6 +72,16 @@ public:
     /// @param coefficients The initial coefficients \f$c_n\f$.
     void set_coefficients(const std::vector<std::complex<double>>& coefficients);
 
+    /// Add initial state coefficient.
+    /// Switch the mode to represent time dependent wave functions, the
+    /// wavefunction is \f$\psi(\vec{x}, t) = \sum_{n}c_n e^{-i E_n t / \hbar}\psi_n(\vec{x})\f$.
+    /// @param n The index \f$n\f$ of the desired energy level.
+    /// @param coefficient The initial coefficients \f$c_n\f$.
+    void set_coefficient(std::size_t n, std::complex<double> coefficient);
+
+    /// Normalize coefficients.
+    void normalize();
+
     /// Set the current energy level.
     /// Switch the mode to represent eigenstates, the wavefunction is
     /// \f$\psi_n(x)\f$.
@@ -182,6 +192,10 @@ public:
         return m_origin;
     }
 
+    double get_norm() const {
+        return m_state_norm;
+    }
+
 protected:
     QState() = default;
 
@@ -220,6 +234,17 @@ private:
     /// This is given by m_coeff.size() and determines if the system is
     /// representing a time depended state or one of the energy eigenstates.
     std::size_t m_num_states = 0;
+
+    /// The norm of m_coeff;
+    double m_state_norm = 0.;
+
+    /// update m_state_norm
+    void norm_update() {
+        m_state_norm = 0.;
+        for (std::size_t i=0; i < m_num_states; i++) {
+            m_state_norm += std::norm(m_coeff[i]);
+        }
+    }
 };
 
 #endif
