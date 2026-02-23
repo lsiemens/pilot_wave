@@ -27,7 +27,7 @@ HarmonicOscillator::HarmonicOscillator(double omega) : m_omega(omega), m_log_ome
     // TODO solve for the widdth
     double N = 3; // s = 0, p = 1, d = 2, f = 3
     double r_rms = std::sqrt((2*N + 3)/(2*m_omega));
-    m_width = 1.5*2*r_rms;
+    m_width = 2*2*r_rms;
     m_origin = glm::dvec3(0., 0., 0.);
     
     m_norm = std::pow(m_m_e*m_omega/(PI_D*m_hbar), 0.75);
