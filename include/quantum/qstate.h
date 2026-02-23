@@ -155,6 +155,13 @@ public:
     /// energy. This is used to access energy eigenstates by their index.
     virtual void find_energy_levels() = 0;
 
+    /// Get energy level from quantum numbers.
+    /// Interpret a vector of integers as quantum numbers (if possible) and find
+    /// the associated energy_level.
+    /// @param quantum_numbers A set of quantum numbers.
+    /// @returns The energy of the associated state.
+    virtual std::size_t level_from_quantum_numbers(std::vector<int> qn) = 0;
+
     /// Get a representation of the quantum states.
     virtual std::string get_state_string() const = 0;
 

@@ -35,6 +35,10 @@ HarmonicOscillator::HarmonicOscillator(double omega) : m_omega(omega), m_log_ome
     find_energy_levels();
 }
 
+std::size_t HarmonicOscillator::level_from_quantum_numbers(std::vector<int> quantum_numbers) {
+    return 0;
+}
+
 std::string HarmonicOscillator::get_state_string() const {
     if (get_num_states() > 0) {
         std::string str_repr = "State magnatude [" + std::to_string(get_norm()) + "]";

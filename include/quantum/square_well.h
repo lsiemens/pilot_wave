@@ -20,6 +20,7 @@ public:
         QuantumNumbers();
         QuantumNumbers(std::size_t n_x, std::size_t n_y, std::size_t n_z);
         bool isValid() const;
+        bool operator==(const QuantumNumbers& other) const;
     };
 
     SquareWell(double width);
@@ -28,6 +29,7 @@ public:
     double psi_n(glm::dvec3 position, std::size_t energy_level) const override;
     glm::dvec3 grad_psi_n(glm::dvec3 position, std::size_t energy_level) const override;
     void find_energy_levels() override;
+    std::size_t level_from_quantum_numbers(std::vector<int> qn) override;
     std::string get_state_string() const override;
     double energy_eigenvalue(QuantumNumbers quantum_numbers) const;
 

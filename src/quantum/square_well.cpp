@@ -24,6 +24,22 @@ bool SquareWell::QuantumNumbers::isValid() const {
     return ((m_n_x > 0) and (m_n_y > 0) and (m_n_z > 0));
 }
 
+bool SquareWell::QuantumNumbers::operator==(const QuantumNumbers& other) const {
+    if (m_n_x != other.m_n_x) {
+        return false;
+    }
+
+    if (m_n_y != other.m_n_y) {
+        return false;
+    }
+
+    if (m_n_z != other.m_n_z) {
+        return false;
+    }
+
+    return true;
+}
+
 SquareWell::SquareWell(double width) {
     m_width = width;
     m_origin = glm::dvec3(width/2., width/2., width/2.);
@@ -31,6 +47,34 @@ SquareWell::SquareWell(double width) {
     m_norm = std::sqrt(2./m_width)*2./m_width;
 
     find_energy_levels();
+}
+
+std::size_t SquareWell::level_from_quantum_numbers(std::vector<int> qn) {
+    if (qn.size() < 3) {
+        throw std::range_error("Three quantum numbers are required.");
+        // raise exception
+    }
+
+    QuantumNumbers quantum_numbers(qn[0], qn[1], qn[2]);
+    
+    if (not quantum_numbers.isValid()) {
+        throw std::runtime_error("Invalid set of quantum numbers.");
+    }
+
+    std::size_t num_states = get_num_states();
+    double energy_level = energy_eigenvalue(quantum_numbers);
+    if (energy_level > m_energy_eigenvalues[num_states - 1]) {
+        for (std::size_t i = 0; i < num_states; i++) {
+            if (quantum_numbers == energy_levels_QN[i]) {
+                return i;
+            }
+        }
+
+        throw std::runtime_error("There are missing energy levels.");
+    } else {
+        set_coefficient(2*num_states, {0., 0.});
+        return level_from_quantum_numbers(qn);
+    }
 }
 
 std::string SquareWell::get_state_string() const {
