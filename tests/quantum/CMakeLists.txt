@@ -1,4 +1,4 @@
-set(TESTS square_well_test harmonic_oscillator_test)
+set(TESTS qstate_test square_well_test harmonic_oscillator_test)
 
 foreach (test_name IN LISTS TESTS)
     add_executable(${test_name} ${test_name}.cpp)
@@ -7,7 +7,8 @@ foreach (test_name IN LISTS TESTS)
         glm::glm
         quantum
         testing
+        GTest::gtest_main
         pilot_wave_warnings)
 
-    add_test(NAME ${test_name} COMMAND ${test_name})
+    gtest_discover_tests(${test_name})
 endforeach()

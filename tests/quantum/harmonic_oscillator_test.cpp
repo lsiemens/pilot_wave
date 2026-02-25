@@ -5,23 +5,10 @@
 
 #include "testing/testing.h"
 #include "testing/integrate.h"
+#include <gtest/gtest.h>
 
-bool test_constants() {
-    HarmonicOscillator ho(1.0);
-    ho.set_energy_level(1);
-
-    if (not is_close(ho.m_hbar, 1., "HarmonicOscillator.m_hbar")) {
-        return false;
-    }
-
-    if (not is_close(ho.m_m_e, 1., "HarmonicOscillator.m_m_e")) {
-        return false;
-    }
-  
-    return true;
-}
-
-bool test_factorial(std::size_t N) {
+TEST(HarmonicOscillatorTest, Factorial) {
+    std::size_t N = 10;
     HarmonicOscillator ho(1.0);
     ho.set_energy_level((N + 1)*(N + 2)*(N + 3)/6);
 
@@ -32,12 +19,8 @@ bool test_factorial(std::size_t N) {
         }
 
         std::string name = "HarmonicOscillator.factorial(" + std::to_string(n) + ")";
-        if (not is_close(ho.factorial(n), fac, name)) {
-            return false;
-        }
+        EXPECT_PRED_FORMAT2(IsClose, ho.factorial(n), fac) << name;
     }
-
-    return true;
 }
 
 double H_5(double x) {
@@ -51,7 +34,7 @@ double H_10(double x) {
 }
 
 /// Test HarmonicOscillator.hermite_n against the 5th and 10th Hermite polynomial.
-bool test_hermite() {
+TEST(HarmonicOscillatorTest, Hermite) {
     HarmonicOscillator ho(1.0);
 
     double width = 5.;
@@ -61,17 +44,11 @@ bool test_hermite() {
         double x = dx*static_cast<double>(i)-0.5*width;
 
         std::string name = "HarmonicOscillator.Hermite(5, " + std::to_string(x) + ")";
-        if (not is_close(ho.hermite_n(5, x), H_5(x), name)) {
-            return false;
-        }
+        EXPECT_PRED_FORMAT2(IsClose, ho.hermite_n(5, x), H_5(x)) << name;
 
         name = "HarmonicOscillator.Hermite(10, " + std::to_string(x) + ")";
-        if (not is_close(ho.hermite_n(10, x), H_10(x), name)) {
-            return false;
-        }
+        EXPECT_PRED_FORMAT2(IsClose, ho.hermite_n(10, x), H_10(x)) << name;
     }
-
-    return true;
 }
 
 double psi_0_1D(double x, double omega) {
@@ -86,7 +63,8 @@ double psi_4_1D(double x, double omega) {
 }
 
 /// Test HarmonicOscillator.psi_n_1D against the 0th and 4th state.
-bool test_psi_1D(double omega) {
+TEST(HarmonicOscillatorTest, Wavefunction1D) {
+    double omega = 1.0;
     HarmonicOscillator ho(omega);
     std::size_t N_max = 4;
     ho.set_energy_level((N_max + 1)*(N_max + 2)*(N_max + 3)/6);
@@ -98,21 +76,16 @@ bool test_psi_1D(double omega) {
         double x = dx*static_cast<double>(i)-0.5*width;
 
         std::string name = "HarmonicOscillator.psi_1D(0, " + std::to_string(x) + ")";
-        if (not is_close(ho.psi_n_1D(0, x), psi_0_1D(x, omega), name)) {
-            return false;
-        }
+        EXPECT_PRED_FORMAT2(IsClose, ho.psi_n_1D(0, x), psi_0_1D(x, omega)) << name;
 
         name = "HarmonicOscillator.psi_1D(4, " + std::to_string(x) + ")";
-        if (not is_close(ho.psi_n_1D(4, x), psi_4_1D(x, omega), name)) {
-            return false;
-        }
+        EXPECT_PRED_FORMAT2(IsClose, ho.psi_n_1D(4, x), psi_4_1D(x, omega)) << name;
     }
-
-    return true;
 }
 
 /// Test HarmonicOscillator.dpsi_n_1D_dx against the derivative of the 0th and 4th state.
-bool test_dpsi_1D_dx(double omega) {
+TEST(HarmonicOscillatorTest, WavefunctionGradient1D) {
+    double omega = 1.0;
     HarmonicOscillator ho(omega);
     std::size_t N_max = 4;
     ho.set_energy_level((N_max + 1)*(N_max + 2)*(N_max + 3)/6);
@@ -126,21 +99,16 @@ bool test_dpsi_1D_dx(double omega) {
 
         std::string name = "HarmonicOscillator.dpsi_1D_dx(0, " + std::to_string(x) + ")";
         double dpsi_1D_dx = (psi_0_1D(x + delta_x, omega) - psi_0_1D(x - delta_x, omega))/(2*delta_x);
-        if (not is_close(ho.dpsi_n_1D_dx(0, x), dpsi_1D_dx, name)) {
-            return false;
-        }
+        EXPECT_PRED_FORMAT2(IsClose, ho.dpsi_n_1D_dx(0, x), dpsi_1D_dx) << name;
 
         name = "HarmonicOscillator.dpsi_1D_dx(4, " + std::to_string(x) + ")";
         dpsi_1D_dx = (psi_4_1D(x + delta_x, omega) - psi_4_1D(x - delta_x, omega))/(2*delta_x);
-        if (not is_close(ho.dpsi_n_1D_dx(4, x), dpsi_1D_dx, name)) {
-            return false;
-        }
+        EXPECT_PRED_FORMAT2(IsClose, ho.dpsi_n_1D_dx(4, x), dpsi_1D_dx) << name;
     }
-
-    return true;
 }
 
-bool test_orthonorm_1D(double omega) {
+TEST(HarmonicOscillatorTest, Orthonorm1D) {
+    double omega = 1.0;
     HarmonicOscillator ho(omega);
     std::size_t N_max = 10;
     ho.set_energy_level((N_max + 1)*(N_max + 2)*(N_max + 3)/6);
@@ -158,101 +126,10 @@ bool test_orthonorm_1D(double omega) {
 
             std::string name = "integral1D(-10, 10) |psi_1D(" + std::to_string(n) + ", x)psi_1D(" + std::to_string(m) + ", x)|^2";
             if (n == m) {
-                if (not is_close(value, 1., name)) {
-                    return false;
-                }
+                EXPECT_PRED_FORMAT2(IsClose, value, 1.) << name;
             } else {
-                if (not is_close(value, 0., name)) {
-                    return false;
-                }
-            }
-            std::cerr << "Passed: (" << n << "," << m << ")" << std::endl;
-        }
-    }
-    return true;
-}
-
-bool test_orthonorm_3D(double omega) {
-    HarmonicOscillator ho(omega);
-    std::size_t N_max = 10;
-    ho.set_energy_level((N_max + 1)*(N_max + 2)*(N_max + 3)/6);
-    double x_max = 10.;
-
-    std::size_t resolution = 100;
-    for (std::size_t n = 0; n < N_max; n++) {
-        for (std::size_t m = 0; m <= n; m++) {
-
-            auto integrand_3D = [&ho, n, m](glm::dvec3 x) {
-                return ho.psi_n(x, n)*ho.psi_n(x, m);
-            };
-
-            auto value = integrate_uniform_3D(-x_max, x_max, resolution, integrand_3D);
-
-            std::string name = "integral(-10, 10) |psi_3D(" + std::to_string(n) + ", x)psi_3D(" + std::to_string(m) + ", x)|^2";
-            if (n == m) {
-                if (not is_close(value, 1., name)) {
-                    return false;
-                }
-            } else {
-                if (not is_close(value, 0., name)) {
-                    return false;
-                }
+                EXPECT_PRED_FORMAT2(IsClose, value, 0.) << name;
             }
         }
     }
-    return true;
-}
-
-int main() {
-    if (not test_constants()) {
-        std::cerr << "\ttest_constants() failed." << std::endl;
-        return 1;
-    }
-
-    if (not test_factorial(10)) {
-        std::cerr << "\ttest_factorial(10) failed." << std::endl;
-        return 1;
-    }
-
-    if (not test_hermite()) {
-        std::cerr << "\ttest_hermite() failed." << std::endl;
-        return 1;
-    }
-
-    if (not test_psi_1D(1.0)) {
-        std::cerr << "\ttest_psi_1D(1.0) failed." << std::endl;
-        return 1;
-    }
-
-    if (not test_psi_1D(3.0)) {
-        std::cerr << "\ttest_psi_1D(3.0) failed." << std::endl;
-        return 1;
-    }
-
-    if (not test_dpsi_1D_dx(1.0)) {
-        std::cerr << "\ttest_dpsi_1D_dx(1.0) failed." << std::endl;
-        return 1;
-    }
-
-    if (not test_dpsi_1D_dx(3.0)) {
-        std::cerr << "\ttest_dpsi_1D_dx(3.0) failed." << std::endl;
-        return 1;
-    }
-
-    if (not test_orthonorm_1D(1.0)) {
-        std::cerr << "\ttest_orthonorm_1D(1.0) failed." << std::endl;
-        return 1;
-    }
-
-    if (not test_orthonorm_3D(1.0)) {
-        std::cerr << "\ttest_orthonorm_3D(1.0) failed." << std::endl;
-        return 1;
-    }
-
-    if (not test_orthonorm_3D(3.0)) {
-        std::cerr << "\ttest_orthonorm_3D(3.0) failed." << std::endl;
-        return 1;
-    }
-
-    return 0;
 }
