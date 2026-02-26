@@ -41,8 +41,8 @@ TEST_P(SquareWellTest, QuantumNumbers) {
     SquareWell sw(1.0);
 
     QN qn = GetParam();
-    std::size_t index = sw.level_from_quantum_numbers(qn.to_vec());
-    sw.set_energy_level(index);
+    std::size_t index = sw.get_index_from_quantum_numbers(qn.to_vec());
+    sw.set_energy_level_index(index);
     EXPECT_STREQ(sw.get_state_string().c_str(), qn.to_str(index).c_str());
 }
 

@@ -14,7 +14,7 @@ TYPED_TEST_SUITE(QStateTest, QStateTypes);
 
 TYPED_TEST(QStateTest, Constants) {
     TypeParam state(1.0);
-    state.set_energy_level(1);
+    state.set_energy_level_index(1);
 
     EXPECT_PRED_FORMAT2(IsClose, state.m_hbar, 1.0);
     EXPECT_PRED_FORMAT2(IsClose, state.m_m_e, 1.0);
@@ -28,7 +28,7 @@ TYPED_TEST(QStateTest, Orthonormal3D) {
     std::size_t N_max = 3;
 #endif
     TypeParam state(param);
-    state.set_energy_level(N_max);
+    state.set_energy_level_index(N_max);
     double x_max = 10.;
 
     std::size_t resolution = 100;

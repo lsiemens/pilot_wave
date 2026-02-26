@@ -29,9 +29,9 @@ public:
     HarmonicOscillator(double omega);
 
     double psi_0_max() const override;
-    double psi_n(glm::dvec3 position, std::size_t energy_level) const override;
-    glm::dvec3 grad_psi_n(glm::dvec3 position, std::size_t energy_level) const override;
-    std::size_t level_from_quantum_numbers(std::vector<int> qn) override;
+    double psi_n(glm::dvec3 position, std::size_t energy_level_index) const override;
+    glm::dvec3 grad_psi_n(glm::dvec3 position, std::size_t energy_level_index) const override;
+    std::size_t get_index_from_quantum_numbers(std::vector<int> qn) override;
     std::string get_state_string() const override;
     void find_energy_levels() override;
 

@@ -35,7 +35,7 @@ HarmonicOscillator::HarmonicOscillator(double omega) : m_omega(omega), m_log_ome
     find_energy_levels();
 }
 
-std::size_t HarmonicOscillator::level_from_quantum_numbers(std::vector<int> quantum_numbers) {
+std::size_t HarmonicOscillator::get_index_from_quantum_numbers(std::vector<int> quantum_numbers) {
     return 0;
 }
 
@@ -44,9 +44,9 @@ std::string HarmonicOscillator::get_state_string() const {
         std::string str_repr = "State magnatude [" + std::to_string(get_norm()) + "]";
         return str_repr;
     } else {
-        std::size_t energy_level = get_energy_level();
-        QuantumNumbers quantum_numbers = m_energy_levels_QN[energy_level];
-        std::string str_repr = "Energy level [" + std::to_string(energy_level) + "] ";
+        std::size_t energy_level_index = get_energy_level_index();
+        QuantumNumbers quantum_numbers = m_energy_levels_QN[energy_level_index];
+        std::string str_repr = "Energy level [" + std::to_string(energy_level_index) + "] ";
         str_repr += "quantum numbers: ";
         str_repr += "(" + std::to_string(quantum_numbers.m_n_x) + ","
                         + std::to_string(quantum_numbers.m_n_y) + ","
@@ -59,16 +59,16 @@ double HarmonicOscillator::psi_0_max() const {
     return m_norm;
 }
 
-double HarmonicOscillator::psi_n(glm::dvec3 position, std::size_t energy_level) const {
-    QuantumNumbers quanum_numbers = m_energy_levels_QN[energy_level];
+double HarmonicOscillator::psi_n(glm::dvec3 position, std::size_t energy_level_index) const {
+    QuantumNumbers quanum_numbers = m_energy_levels_QN[energy_level_index];
 
     return ( psi_n_1D(quanum_numbers.m_n_x, position.x)
             *psi_n_1D(quanum_numbers.m_n_y, position.y)
             *psi_n_1D(quanum_numbers.m_n_z, position.z));
 }
 
-glm::dvec3 HarmonicOscillator::grad_psi_n(glm::dvec3 position, std::size_t energy_level) const {
-    QuantumNumbers quanum_numbers = m_energy_levels_QN[energy_level];
+glm::dvec3 HarmonicOscillator::grad_psi_n(glm::dvec3 position, std::size_t energy_level_index) const {
+    QuantumNumbers quanum_numbers = m_energy_levels_QN[energy_level_index];
 
     double grad_x =( dpsi_n_1D_dx(quanum_numbers.m_n_x, position.x)
                     * psi_n_1D(quanum_numbers.m_n_y, position.y)
@@ -90,7 +90,7 @@ void HarmonicOscillator::find_energy_levels() {
     if (get_num_states() > 0) {
         n_states = get_num_states();
     } else {
-        n_states = get_energy_level() + 1;
+        n_states = get_energy_level_index() + 1;
     }
 
     std::cout << "Find energy levels: # states " << n_states << std::endl;

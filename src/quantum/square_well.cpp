@@ -49,7 +49,7 @@ SquareWell::SquareWell(double width) {
     find_energy_levels();
 }
 
-std::size_t SquareWell::level_from_quantum_numbers(std::vector<int> qn) {
+std::size_t SquareWell::get_index_from_quantum_numbers(std::vector<int> qn) {
     if (qn.size() < 3) {
         throw std::range_error("Three quantum numbers are required.");
         // raise exception
@@ -62,10 +62,10 @@ std::size_t SquareWell::level_from_quantum_numbers(std::vector<int> qn) {
     }
 
     std::size_t num_states = get_num_states();
-    double energy_level = energy_eigenvalue(quantum_numbers);
+    double energy_level = get_energy_eigenvalue(quantum_numbers);
     if (energy_level < m_energy_eigenvalues[num_states - 1]) {
         for (std::size_t i = 0; i < num_states; i++) {
-            if (quantum_numbers == energy_levels_QN[i]) {
+            if (quantum_numbers == m_energy_levels_QN[i]) {
                 return i;
             }
         }
@@ -73,7 +73,7 @@ std::size_t SquareWell::level_from_quantum_numbers(std::vector<int> qn) {
         throw std::runtime_error("There are missing energy levels.");
     } else {
         set_coefficient(2*num_states, {0., 0.});
-        return level_from_quantum_numbers(qn);
+        return get_index_from_quantum_numbers(qn);
     }
 }
 
@@ -82,9 +82,9 @@ std::string SquareWell::get_state_string() const {
         std::string str_repr = "State magnatude [" + std::to_string(get_norm()) + "]";
         return str_repr;
     } else {
-        std::size_t energy_level = get_energy_level();
-        QuantumNumbers quantum_numbers = energy_levels_QN[energy_level];
-        std::string str_repr = "Energy level [" + std::to_string(energy_level) + "] ";
+        std::size_t energy_level_index = get_energy_level_index();
+        QuantumNumbers quantum_numbers = m_energy_levels_QN[energy_level_index];
+        std::string str_repr = "Energy level [" + std::to_string(energy_level_index) + "] ";
         str_repr += "quantum numbers: ";
         str_repr += "(" + std::to_string(quantum_numbers.m_n_x) + ","
                         + std::to_string(quantum_numbers.m_n_y) + ","
@@ -97,9 +97,9 @@ double SquareWell::psi_0_max() const {
     return m_norm;
 }
 
-double SquareWell::psi_n(glm::dvec3 position, std::size_t energy_level) const {
-    assert(energy_level < energy_levels_QN.size());
-    QuantumNumbers quantum_numbers = energy_levels_QN[energy_level];
+double SquareWell::psi_n(glm::dvec3 position, std::size_t energy_level_index) const {
+    assert(energy_level_index < m_energy_levels_QN.size());
+    QuantumNumbers quantum_numbers = m_energy_levels_QN[energy_level_index];
 
     if ((position.x < 0) or (position.x > m_width)) {
         return 0.;
@@ -122,9 +122,9 @@ double SquareWell::psi_n(glm::dvec3 position, std::size_t energy_level) const {
                  *std::sin(k_z*position.z);
 }
 
-glm::dvec3 SquareWell::grad_psi_n(glm::dvec3 position, std::size_t energy_level) const {
-    assert(energy_level < energy_levels_QN.size());
-    QuantumNumbers quantum_numbers = energy_levels_QN[energy_level];
+glm::dvec3 SquareWell::grad_psi_n(glm::dvec3 position, std::size_t energy_level_index) const {
+    assert(energy_level_index < m_energy_levels_QN.size());
+    QuantumNumbers quantum_numbers = m_energy_levels_QN[energy_level_index];
 
     if ((position.x < 0) or (position.x > m_width)) {
         return glm::dvec3(0., 0., 0.);
@@ -154,7 +154,7 @@ void SquareWell::find_energy_levels() {
     if (get_num_states() > 0) {
         n_states = get_num_states();
     } else {
-        n_states = get_energy_level() + 1;
+        n_states = get_energy_level_index() + 1;
     }
 
     //std::cout << "Find energy levels: # states " << n_states << std::endl;
@@ -172,8 +172,8 @@ void SquareWell::find_energy_levels() {
     }
 
     auto comparison = [this](const QuantumNumbers& a, const QuantumNumbers& b) {
-        double E_a = energy_eigenvalue(a);
-        double E_b = energy_eigenvalue(b);
+        double E_a = get_energy_eigenvalue(a);
+        double E_b = get_energy_eigenvalue(b);
 
         // If energy levels are degenerate sort by the quantum numbers from n_x
         // to n_z. this defines a canonical order for degenerate states.
@@ -197,16 +197,16 @@ void SquareWell::find_energy_levels() {
     };
     std::sort(initial_set.begin(), initial_set.end(), comparison);
 
-    energy_levels_QN.resize(n_states);
-    std::copy_n(initial_set.begin(), n_states, energy_levels_QN.begin());
+    m_energy_levels_QN.resize(n_states);
+    std::copy_n(initial_set.begin(), n_states, m_energy_levels_QN.begin());
 
     m_energy_eigenvalues.resize(n_states);
     for (std::size_t i = 0; i < n_states; i++) {
-        m_energy_eigenvalues[i] = energy_eigenvalue(energy_levels_QN[i]);
+        m_energy_eigenvalues[i] = get_energy_eigenvalue(m_energy_levels_QN[i]);
     }
 }
 
-double SquareWell::energy_eigenvalue(QuantumNumbers quantum_numbers) const {
+double SquareWell::get_energy_eigenvalue(QuantumNumbers quantum_numbers) const {
     if (not quantum_numbers.isValid()) {
         throw std::out_of_range("Invalid quantum numbers");
     }

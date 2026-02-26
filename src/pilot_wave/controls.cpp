@@ -76,8 +76,8 @@ void Controls::update(double dt) {
     // Ingest key press, it will be reset after this point
     if (m_key_pressed[GLFW_KEY_E]) {
         if (m_qparticles_sptr->m_qstate_uptr->get_num_states() == 0) {
-            std::size_t energy_level = m_qparticles_sptr->m_qstate_uptr->get_energy_level();
-            m_qparticles_sptr->m_qstate_uptr->set_energy_level(energy_level + 1);
+            std::size_t energy_level_index = m_qparticles_sptr->m_qstate_uptr->get_energy_level_index();
+            m_qparticles_sptr->m_qstate_uptr->set_energy_level_index(energy_level_index + 1);
         }
         m_key_pressed[GLFW_KEY_E] = false;
     }
@@ -85,9 +85,9 @@ void Controls::update(double dt) {
     // Ingest key press, it will be reset after this point
     if (m_key_pressed[GLFW_KEY_Q]) {
         if (m_qparticles_sptr->m_qstate_uptr->get_num_states() == 0) {
-            std::size_t energy_level = m_qparticles_sptr->m_qstate_uptr->get_energy_level();
-            if (energy_level > 0) {
-                m_qparticles_sptr->m_qstate_uptr->set_energy_level(energy_level - 1);
+            std::size_t energy_level_index = m_qparticles_sptr->m_qstate_uptr->get_energy_level_index();
+            if (energy_level_index > 0) {
+                m_qparticles_sptr->m_qstate_uptr->set_energy_level_index(energy_level_index - 1);
             }
         }
         m_key_pressed[GLFW_KEY_Q] = false;
@@ -123,7 +123,7 @@ void Controls::command(std::string command_str) {
         std::size_t n = static_cast<std::size_t>(std::max(0, signed_n));
 
         if ((c_r == 0) and (c_i == 0)) {
-            m_qparticles_sptr->m_qstate_uptr->set_energy_level(n);
+            m_qparticles_sptr->m_qstate_uptr->set_energy_level_index(n);
             return;
         }
 
@@ -144,8 +144,8 @@ void Controls::command(std::string command_str) {
         stream >> qn_1 >> skip >> qn_2 >> skip >> qn_3 >> skip >> c_r >> skip >> c_i;
 
         if ((c_r == 0) and (c_i == 0)) {
-            std::size_t index = m_qparticles_sptr->m_qstate_uptr->level_from_quantum_numbers({qn_1, qn_2, qn_3});
-            m_qparticles_sptr->m_qstate_uptr->set_energy_level(index);
+            std::size_t index = m_qparticles_sptr->m_qstate_uptr->get_index_from_quantum_numbers({qn_1, qn_2, qn_3});
+            m_qparticles_sptr->m_qstate_uptr->set_energy_level_index(index);
             return;
         }
 

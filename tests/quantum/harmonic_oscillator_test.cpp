@@ -10,7 +10,7 @@
 TEST(HarmonicOscillatorTest, Factorial) {
     std::size_t N = 10;
     HarmonicOscillator ho(1.0);
-    ho.set_energy_level((N + 1)*(N + 2)*(N + 3)/6);
+    ho.set_energy_level_index((N + 1)*(N + 2)*(N + 3)/6);
 
     for (std::size_t n = 0; n <= N; n++) {
         double fac = 1.;
@@ -67,7 +67,7 @@ TEST(HarmonicOscillatorTest, Wavefunction1D) {
     double omega = 1.0;
     HarmonicOscillator ho(omega);
     std::size_t N_max = 4;
-    ho.set_energy_level((N_max + 1)*(N_max + 2)*(N_max + 3)/6);
+    ho.set_energy_level_index((N_max + 1)*(N_max + 2)*(N_max + 3)/6);
 
     double width = 6/std::sqrt(2*omega);
     std::size_t resolution = 100;
@@ -88,7 +88,7 @@ TEST(HarmonicOscillatorTest, WavefunctionGradient1D) {
     double omega = 1.0;
     HarmonicOscillator ho(omega);
     std::size_t N_max = 4;
-    ho.set_energy_level((N_max + 1)*(N_max + 2)*(N_max + 3)/6);
+    ho.set_energy_level_index((N_max + 1)*(N_max + 2)*(N_max + 3)/6);
 
     double width = 6/std::sqrt(2*omega);
     std::size_t resolution = 100;
@@ -111,7 +111,7 @@ TEST(HarmonicOscillatorTest, Orthonorm1D) {
     double omega = 1.0;
     HarmonicOscillator ho(omega);
     std::size_t N_max = 10;
-    ho.set_energy_level((N_max + 1)*(N_max + 2)*(N_max + 3)/6);
+    ho.set_energy_level_index((N_max + 1)*(N_max + 2)*(N_max + 3)/6);
     double x_max = 10.;
 
     std::size_t resolution = 100;

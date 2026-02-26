@@ -4,7 +4,7 @@ void QState::set_coefficients(const std::vector<std::complex<double>>& coefficie
     m_coeff = coefficients;
     m_coeff_t = coefficients;
     m_num_states = m_coeff.size();
-    m_energy_level = 0;
+    m_energy_level_index = 0;
     m_time = 0.;
 
     find_energy_levels();
@@ -22,7 +22,7 @@ void QState::set_coefficient(std::size_t n, std::complex<double> coefficient) {
 
     m_coeff_t = m_coeff;
     m_num_states = m_coeff.size();
-    m_energy_level = 0;
+    m_energy_level_index = 0;
     m_time = 0.;
 
     find_energy_levels();
@@ -30,7 +30,7 @@ void QState::set_coefficient(std::size_t n, std::complex<double> coefficient) {
 }
 
 void QState::set_coefficient(std::vector<int> quantum_numbers, std::complex<double> coefficient) {
-    std::size_t index = level_from_quantum_numbers(quantum_numbers);
+    std::size_t index = get_index_from_quantum_numbers(quantum_numbers);
     set_coefficient(index, coefficient);
 }
 
@@ -46,8 +46,8 @@ void QState::normalize() {
     norm_update();
 }
 
-void QState::set_energy_level(std::size_t energy_level) {
-    m_energy_level = energy_level;
+void QState::set_energy_level_index(std::size_t energy_level_index) {
+    m_energy_level_index = energy_level_index;
     m_num_states = 0;
 
     find_energy_levels();
@@ -75,7 +75,7 @@ double QState::probability_density(glm::dvec3 position) const {
         }
         return std::norm(psi);
     } else {
-        double psi = psi_n(position, m_energy_level);
+        double psi = psi_n(position, m_energy_level_index);
         return psi*psi;
     }
 }

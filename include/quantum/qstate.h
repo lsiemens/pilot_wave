@@ -87,8 +87,8 @@ public:
     /// Set the current energy level.
     /// Switch the mode to represent eigenstates, the wavefunction is
     /// \f$\psi_n(x)\f$.
-    /// @param energy_level The index \f$n\f$ of the desired eigenstate.
-    void set_energy_level(std::size_t energy_level);
+    /// @param energy_level_index The index \f$n\f$ of the desired eigenstate.
+    void set_energy_level_index(std::size_t energy_level_index);
 
     /// Update the quantum state.
     /// Increment the internal time and update the time dependent coefficient
@@ -136,21 +136,21 @@ public:
     /// Evaluates the wavefunction \f$\psi_n(\vec{x})\f$.
     /// @param position The location \f$\vec{x}\f$ at which to evaluate the
     /// wavefunction, position is a 3 vector with units of \f$[a_0]\f$.
-    /// @param energy_level The index \f$n\f$ of the energy eigenstate to
+    /// @param energy_level_index The index \f$n\f$ of the energy eigenstate to
     /// evaluate.
     /// @returns The probability density of the state is given in units of
     /// \f$[{a_0}^{-3/2}]\f$.
-    virtual double psi_n(glm::dvec3 position, std::size_t energy_level) const = 0;
+    virtual double psi_n(glm::dvec3 position, std::size_t energy_level_index) const = 0;
 
     /// The gradient of the Nth energy eigenstate.
     /// Evaluates the gradient of the function \f$\vec{\nabla}\psi_n(\vec{x})\f$.
     /// @param position The location \f$\vec{x}\f$ at which to evaluate the
     /// gradient, position is a 3 vector with units of \f$[a_0]\f$.
-    /// @param energy_level The index \f$n\f$ of the energy eigenstate to
+    /// @param energy_level_index The index \f$n\f$ of the energy eigenstate to
     /// evaluate.
     /// @returns The gradient of the probability density of the state is given
     /// in units of \f$[{a_0}^{-5/2}]\f$.
-    virtual glm::dvec3 grad_psi_n(glm::dvec3 position, std::size_t energy_level) const = 0;
+    virtual glm::dvec3 grad_psi_n(glm::dvec3 position, std::size_t energy_level_index) const = 0;
 
     /// Compute the energy levels of the system.
     /// Find energy levels and the set of quantum numbers ordered by their
@@ -159,10 +159,10 @@ public:
 
     /// Get energy level from quantum numbers.
     /// Interpret a vector of integers as quantum numbers (if possible) and find
-    /// the associated energy_level.
+    /// the associated energy_level_index.
     /// @param quantum_numbers A set of quantum numbers.
     /// @returns The energy of the associated state.
-    virtual std::size_t level_from_quantum_numbers(std::vector<int> qn) = 0;
+    virtual std::size_t get_index_from_quantum_numbers(std::vector<int> qn) = 0;
 
     /// Get a representation of the quantum states.
     virtual std::string get_state_string() const = 0;
@@ -172,17 +172,17 @@ public:
     /// Get the number of coefficients.
     /// Get the number of states defined in the private vector m_coeff. If this
     /// is zero, then the system is in an energy eigenstates defined by the
-    /// private index m_energy_level.
+    /// private index m_energy_level_index.
     std::size_t get_num_states() const {
         return m_num_states;
     }
 
     /// Get the energy level.
     /// Get the energy level of the system defined by the private index
-    /// m_energy_level. The system only uses this index if the number of states
+    /// m_energy_level_index. The system only uses this index if the number of states
     /// in the private vector m_coeff is zero.
-    std::size_t get_energy_level() const {
-        return m_energy_level;
+    std::size_t get_energy_level_index() const {
+        return m_energy_level_index;
     }
 
     /// Get the width of the system.
@@ -237,7 +237,7 @@ private:
     /// The energy level of the current energy eigenstate.
     /// The index of the energy level for the system. Used if m_num_states is
     /// zero.
-    std::size_t m_energy_level = 0;
+    std::size_t m_energy_level_index = 0;
 
     /// The number of defined state coefficients.
     /// This is given by m_coeff.size() and determines if the system is

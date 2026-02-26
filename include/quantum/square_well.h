@@ -12,7 +12,7 @@
 /// @ingroup quantum_mechanics
 class SquareWell : public QState {
 public:
-    struct QuantumNumbers {
+     struct QuantumNumbers {
         std::size_t m_n_x;
         std::size_t m_n_y;
         std::size_t m_n_z;
@@ -26,15 +26,15 @@ public:
     SquareWell(double width);
 
     double psi_0_max() const override;
-    double psi_n(glm::dvec3 position, std::size_t energy_level) const override;
-    glm::dvec3 grad_psi_n(glm::dvec3 position, std::size_t energy_level) const override;
+    double psi_n(glm::dvec3 position, std::size_t energy_level_index) const override;
+    glm::dvec3 grad_psi_n(glm::dvec3 position, std::size_t energy_level_index) const override;
     void find_energy_levels() override;
-    std::size_t level_from_quantum_numbers(std::vector<int> qn) override;
+    std::size_t get_index_from_quantum_numbers(std::vector<int> qn) override;
     std::string get_state_string() const override;
-    double energy_eigenvalue(QuantumNumbers quantum_numbers) const;
+    double get_energy_eigenvalue(QuantumNumbers quantum_numbers) const;
 
 private:
-    std::vector<QuantumNumbers> energy_levels_QN;    
+    std::vector<QuantumNumbers> m_energy_levels_QN;    
     double m_norm;
 };
 
