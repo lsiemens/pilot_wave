@@ -29,6 +29,11 @@ void QState::set_coefficient(std::size_t n, std::complex<double> coefficient) {
     norm_update();
 }
 
+void QState::set_coefficient(std::vector<int> quantum_numbers, std::complex<double> coefficient) {
+    std::size_t index = level_from_quantum_numbers(quantum_numbers);
+    set_coefficient(index, coefficient);
+}
+
 void QState::normalize() {
     norm_update();
     double value = 1/std::sqrt(m_state_norm);

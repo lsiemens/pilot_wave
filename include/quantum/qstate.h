@@ -79,6 +79,8 @@ public:
     /// @param coefficient The initial coefficients \f$c_n\f$.
     void set_coefficient(std::size_t n, std::complex<double> coefficient);
 
+    void set_coefficient(std::vector<int> quantum_numbers, std::complex<double> coefficient);
+
     /// Normalize coefficients.
     void normalize();
 

@@ -131,6 +131,29 @@ void Controls::command(std::string command_str) {
         m_qparticles_sptr->m_qstate_uptr->set_coefficient(n, coefficient);
     }
 
+    if (command_str.starts_with("qn:")) {
+        std::string prefix;
+        std::istringstream stream(command_str);
+        std::getline(stream, prefix, ':');
+
+        char skip;
+        int qn_1 = 0;
+        int qn_2 = 0;
+        int qn_3 = 0;
+        double c_i=0, c_r=0;
+        stream >> qn_1 >> skip >> qn_2 >> skip >> qn_3 >> skip >> c_r >> skip >> c_i;
+
+        if ((c_r == 0) and (c_i == 0)) {
+            std::size_t index = m_qparticles_sptr->m_qstate_uptr->level_from_quantum_numbers({qn_1, qn_2, qn_3});
+            m_qparticles_sptr->m_qstate_uptr->set_energy_level(index);
+            return;
+        }
+
+        std::complex<double> coefficient(c_r, c_i);
+        m_qparticles_sptr->m_qstate_uptr->set_coefficient({qn_1, qn_2, qn_3}, coefficient);
+    }
+
+
     if (command_str.starts_with("clear")) {
         m_qparticles_sptr->m_qstate_uptr->set_coefficients({{0., 0.}});
     }
