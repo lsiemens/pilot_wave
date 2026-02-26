@@ -22,6 +22,22 @@ bool HarmonicOscillator::QuantumNumbers::isValid() const {
     return true;
 }
 
+bool HarmonicOscillator::QuantumNumbers::operator==(const QuantumNumbers& other) const {
+    if (m_n_x != other.m_n_x) {
+        return false;
+    }
+
+    if (m_n_y != other.m_n_y) {
+        return false;
+    }
+
+    if (m_n_z != other.m_n_z) {
+        return false;
+    }
+
+    return true;
+}
+
 
 HarmonicOscillator::HarmonicOscillator(double omega) : m_omega(omega), m_log_omega(std::log(omega)), m_sqrt_m_omega_hbar(std::sqrt(m_m_e*omega/m_hbar)) {
     // TODO solve for the widdth
@@ -35,8 +51,32 @@ HarmonicOscillator::HarmonicOscillator(double omega) : m_omega(omega), m_log_ome
     find_energy_levels();
 }
 
-std::size_t HarmonicOscillator::get_index_from_quantum_numbers(std::vector<int> quantum_numbers) {
-    return 0;
+std::size_t HarmonicOscillator::get_index_from_quantum_numbers(std::vector<int> qn) {
+    if (qn.size() < 3) {
+        throw std::range_error("Three quantum numbers are required.");
+        // raise exception
+    }
+
+    QuantumNumbers quantum_numbers(qn[0], qn[1], qn[2]);
+
+    if (not quantum_numbers.isValid()) {
+        throw std::runtime_error("Invalid set of quantum numbers.");
+    }
+
+    std::size_t num_states = get_num_states();
+    double energy_level = get_energy_eigenvalue(quantum_numbers);
+    if (energy_level < m_energy_eigenvalues[num_states - 1]) {
+        for (std::size_t i = 0; i < num_states; i++) {
+            if (quantum_numbers == m_energy_levels_QN[i]) {
+                return i;
+            }
+        }
+
+        throw std::runtime_error("There are missing energy levels.");
+    } else {
+        set_coefficient(2*num_states, {0., 0.});
+        return get_index_from_quantum_numbers(qn);
+    }
 }
 
 std::string HarmonicOscillator::get_state_string() const {
@@ -93,7 +133,7 @@ void HarmonicOscillator::find_energy_levels() {
         n_states = get_energy_level_index() + 1;
     }
 
-    std::cout << "Find energy levels: # states " << n_states << std::endl;
+    //std::cout << "Find energy levels: # states " << n_states << std::endl;
 
     std::size_t N_max = static_cast<std::size_t>(std::ceil(std::pow(6.*static_cast<double>(n_states), 1/3.) - 2.));
 
@@ -116,7 +156,26 @@ void HarmonicOscillator::find_energy_levels() {
     // TODO sort by n^2 then by E using a stable sorting algorithm so degenerate
     // blocks are grouped by spin
     auto comparison = [this](const QuantumNumbers& a, const QuantumNumbers& b) {
-        return energy_eigenvalue(a) < energy_eigenvalue(b);
+        double E_a = get_energy_eigenvalue(a);
+        double E_b = get_energy_eigenvalue(b);
+
+        if (E_a == E_b) {
+            if (a.m_n_x != b.m_n_x) {
+                return a.m_n_x < b.m_n_x;
+            }
+
+            if (a.m_n_y != b.m_n_y) {
+                return a.m_n_y < b.m_n_y;
+            }
+
+            if (a.m_n_z != b.m_n_z) {
+                return a.m_n_z < b.m_n_z;
+            }
+
+            throw std::runtime_error("No ordering, quanum numbers are equal");
+        }
+
+        return E_a < E_b;
     };
     std::sort(initial_set.begin(), initial_set.end(), comparison);
 
@@ -125,7 +184,7 @@ void HarmonicOscillator::find_energy_levels() {
 
     m_energy_eigenvalues.resize(n_states);
     for (std::size_t i = 0; i < n_states; i++) {
-        m_energy_eigenvalues[i] = energy_eigenvalue(m_energy_levels_QN[i]);
+        m_energy_eigenvalues[i] = get_energy_eigenvalue(m_energy_levels_QN[i]);
     }
 
     m_cumsum_ln_n.resize(N_max + 1);
@@ -137,7 +196,7 @@ void HarmonicOscillator::find_energy_levels() {
     m_N_max = N_max;
 }
 
-double HarmonicOscillator::energy_eigenvalue(QuantumNumbers quantum_numbers) const {
+double HarmonicOscillator::get_energy_eigenvalue(QuantumNumbers quantum_numbers) const {
     double N = static_cast<double>(quantum_numbers.m_n_x + quantum_numbers.m_n_y + quantum_numbers.m_n_z);
 
     return m_hbar*m_omega*(N + 1.5);

@@ -24,6 +24,7 @@ public:
         QuantumNumbers();
         QuantumNumbers(std::size_t n_x, std::size_t n_y, std::size_t n_z);
         bool isValid() const;
+        bool operator==(const QuantumNumbers& other) const;
     };
 
     HarmonicOscillator(double omega);
@@ -35,7 +36,7 @@ public:
     std::string get_state_string() const override;
     void find_energy_levels() override;
 
-    double energy_eigenvalue(QuantumNumbers quantum_numbers) const;
+    double get_energy_eigenvalue(QuantumNumbers quantum_numbers) const;
     double factorial(std::size_t n) const;
     double hermite_n(std::size_t n, double x) const;
     double psi_n_1D(std::size_t n, double x) const;

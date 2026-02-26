@@ -133,3 +133,53 @@ TEST(HarmonicOscillatorTest, Orthonorm1D) {
         }
     }
 }
+
+struct QN {
+    int n_x, n_y, n_z;
+
+    std::vector<int> to_vec() {
+        return {n_x, n_y, n_z};
+    }
+    std::string to_str(std::size_t index) const {
+        std::string expected_str = "Energy level [" + std::to_string(index) + "] quantum numbers: (" + std::to_string(n_x) + "," + std::to_string(n_y) + "," + std::to_string(n_z) + ")";
+        return expected_str;
+    }
+};
+
+void PrintTo(const QN& qn, std::ostream* os) {
+    *os << "[n_x, n_y, n_z] = [ " << qn.n_x << ", " << qn.n_y << ", " << qn.n_z << "]";
+}
+
+std::vector<QN> generate_tests(std::size_t N) {
+    std::vector<QN> tests;
+
+    tests.resize(N*N*N);
+    std::size_t index = 0;
+    for (std::size_t i = 0; i < N; i++) {
+        for (std::size_t j = 0; j < N; j++) {
+            for (std::size_t k = 0; k < N; k++) {
+                tests[index] = QN(static_cast<int>(i), static_cast<int>(j), static_cast<int>(k));
+                index++;
+            }
+        }
+    }
+    return tests;
+}
+
+class HarmonicOscillatorTest : public ::testing::TestWithParam<QN> {};
+
+TEST_P(HarmonicOscillatorTest, QuantumNumbers) {
+    HarmonicOscillator ho(1.0);
+
+    QN qn = GetParam();
+    std::size_t index = ho.get_index_from_quantum_numbers(qn.to_vec());
+    ho.set_energy_level_index(index);
+    EXPECT_STREQ(ho.get_state_string().c_str(), qn.to_str(index).c_str());
+}
+
+#ifdef FULL_TEST
+INSTANTIATE_TEST_SUITE_P(SampleValues, HarmonicOscillatorTest, ::testing::ValuesIn(generate_tests(10)));
+#else
+INSTANTIATE_TEST_SUITE_P(SampleValues, HarmonicOscillatorTest, ::testing::ValuesIn(generate_tests(3)));
+#endif
+
