@@ -1,3 +1,7 @@
+if(FULL_TEST)
+    add_compile_definitions(FULL_TEST)
+endif()
+
 include(FetchContent)
 
 FetchContent_Declare(googletest

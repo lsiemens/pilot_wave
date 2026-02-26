@@ -18,6 +18,7 @@ option(ENABLE_WARNINGS "Enable compiler warnings" ON)
 option(STRICT_WARNINGS "Enable strict compiler warnings" ON)
 option(ERROR_ON_WARNING "Treat warnings to errors" OFF)
 option(BUILD_DOC "Build documentation" OFF)
+option(FULL_TEST "Run full test set (may be slow)." OFF)
 
 add_library(pilot_wave_warnings INTERFACE)
 if(ENABLE_WARNINGS)

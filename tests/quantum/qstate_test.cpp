@@ -22,7 +22,11 @@ TYPED_TEST(QStateTest, Constants) {
 
 TYPED_TEST(QStateTest, Orthonormal3D) {
     double param = 1.0;
+#ifdef FULL_TEST
     std::size_t N_max = 10;
+#else
+    std::size_t N_max = 3;
+#endif
     TypeParam state(param);
     state.set_energy_level(N_max);
     double x_max = 10.;

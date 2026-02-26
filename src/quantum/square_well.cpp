@@ -63,7 +63,7 @@ std::size_t SquareWell::level_from_quantum_numbers(std::vector<int> qn) {
 
     std::size_t num_states = get_num_states();
     double energy_level = energy_eigenvalue(quantum_numbers);
-    if (energy_level > m_energy_eigenvalues[num_states - 1]) {
+    if (energy_level < m_energy_eigenvalues[num_states - 1]) {
         for (std::size_t i = 0; i < num_states; i++) {
             if (quantum_numbers == energy_levels_QN[i]) {
                 return i;
@@ -172,7 +172,28 @@ void SquareWell::find_energy_levels() {
     }
 
     auto comparison = [this](const QuantumNumbers& a, const QuantumNumbers& b) {
-        return energy_eigenvalue(a) < energy_eigenvalue(b);
+        double E_a = energy_eigenvalue(a);
+        double E_b = energy_eigenvalue(b);
+
+        // If energy levels are degenerate sort by the quantum numbers from n_x
+        // to n_z. this defines a canonical order for degenerate states.
+        if (E_a == E_b) {
+            if (a.m_n_x != b.m_n_x) {
+                return a.m_n_x < b.m_n_x;
+            }
+
+            if (a.m_n_y != b.m_n_y) {
+                return a.m_n_y < b.m_n_y;
+            }
+
+            if (a.m_n_z != b.m_n_z) {
+                return a.m_n_z < b.m_n_z;
+            }
+
+            throw std::runtime_error("No ordering, quantum numbers are equal");
+        }
+
+        return E_a < E_b;
     };
     std::sort(initial_set.begin(), initial_set.end(), comparison);
 
