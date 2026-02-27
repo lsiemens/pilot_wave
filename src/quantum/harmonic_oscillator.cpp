@@ -187,12 +187,6 @@ void HarmonicOscillator::find_energy_levels() {
         m_energy_eigenvalues[i] = get_energy_eigenvalue(m_energy_levels_QN[i]);
     }
 
-    m_cumsum_ln_n.resize(N_max + 1);
-    m_cumsum_ln_n[0] = 0.;
-    for (std::size_t n = 1; n < N_max; n++) {
-        m_cumsum_ln_n[n] = std::log(n) + m_cumsum_ln_n[n - 1];
-    }
-    
     m_N_max = N_max;
 }
 
@@ -200,13 +194,6 @@ double HarmonicOscillator::get_energy_eigenvalue(QuantumNumbers quantum_numbers)
     double N = static_cast<double>(quantum_numbers.m_n_x + quantum_numbers.m_n_y + quantum_numbers.m_n_z);
 
     return m_hbar*m_omega*(N + 1.5);
-}
-
-double HarmonicOscillator::factorial(std::size_t n) const {
-    if (n > m_N_max) {
-        throw std::out_of_range("n! out of precomputed range");
-    }
-    return std::exp(m_cumsum_ln_n[n]);
 }
 
 double HarmonicOscillator::hermite_n(std::size_t n, double x) const {
@@ -234,7 +221,7 @@ double HarmonicOscillator::psi_n_1D(std::size_t n, double x) const {
     static const double log2 = std::log(2);
     static const double logPI = std::log(PI_D);
 
-    double ln_prefactor = 0.25*(m_log_omega - logPI) - 0.5*(static_cast<double>(n)*log2 + m_cumsum_ln_n[n]);
+    double ln_prefactor = 0.25*(m_log_omega - logPI) - 0.5*(static_cast<double>(n)*log2 + ln_factorial(n));
     double exponent = ln_prefactor - (m_m_e*m_omega*x*x/(2.*m_hbar));
     return std::exp(exponent)*hermite_n(n, m_sqrt_m_omega_hbar*x);
 }
@@ -243,7 +230,7 @@ double HarmonicOscillator::dpsi_n_1D_dx(std::size_t n, double x) const {
     static const double log2 = std::log(2);
     static const double logPI = std::log(PI_D);
 
-    double ln_prefactor = 0.25*(m_log_omega - logPI) - 0.5*(static_cast<double>(n)*log2 + m_cumsum_ln_n[n]);
+    double ln_prefactor = 0.25*(m_log_omega - logPI) - 0.5*(static_cast<double>(n)*log2 + ln_factorial(n));
     double exponent = ln_prefactor - (m_m_e*m_omega*x*x/(2.*m_hbar));
     double polynomial = ((m_m_e*m_omega/m_hbar)*x*hermite_n(n, m_sqrt_m_omega_hbar*x)
                          -m_sqrt_m_omega_hbar*hermite_n(n + 1, m_sqrt_m_omega_hbar*x));

@@ -7,22 +7,6 @@
 #include "testing/integrate.h"
 #include <gtest/gtest.h>
 
-TEST(HarmonicOscillatorTest, Factorial) {
-    std::size_t N = 10;
-    HarmonicOscillator ho(1.0);
-    ho.set_energy_level_index((N + 1)*(N + 2)*(N + 3)/6);
-
-    for (std::size_t n = 0; n <= N; n++) {
-        double fac = 1.;
-        for (std::size_t i = 1; i <= n; i++) {
-            fac *= static_cast<double>(i);
-        }
-
-        std::string name = "HarmonicOscillator.factorial(" + std::to_string(n) + ")";
-        EXPECT_PRED_FORMAT2(IsClose, ho.factorial(n), fac) << name;
-    }
-}
-
 double H_5(double x) {
     return 32.*std::pow(x, 5) - 160.*std::pow(x, 3) + 120.*x;
 }
