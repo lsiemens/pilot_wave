@@ -47,7 +47,8 @@
 /// momentum operators interms of the new variables including L+-. Describe the
 /// LRL vector (Laplace-Runge-Lenz vector) in classical orbital mechanics and
 /// its application to QM, the extended SO(4) symmetry and raising and lowering
-/// operators. 
+/// operators.
+/// Refrences: arxiv.org/pdf/2305.18229
 
 #ifndef HYDROGEN_ATOM_H
 #define HYDROGEN_ATOM_H
